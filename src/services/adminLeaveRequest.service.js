@@ -1,5 +1,5 @@
 const leaveRequestRepository = require('../repositories/leaveRequest.repository');
-const { assertValidDateRange, assertLeaveTypeExists } = require('../utils/leaveRequestValidators');
+const { assertValidDateRange, assertLeaveTypeExists, assertReportProvided } = require('../utils/leaveRequestValidators');
 const activityLogService = require('./activityLog.service');
 
 const VALID_STATUSES = ['pending', 'approved', 'rejected', 'cancelled'];
@@ -32,12 +32,15 @@ async function getLeaveRequestById(id) {
   return request;
 }
 
-async function updateLeaveRequest(id, { leave_type_id, start_date, end_date, reason }) {
-  await getLeaveRequestById(id);
+async function updateLeaveRequest(id, { leave_type_id, start_date, end_date, reason, report_file }) {
+  const existing = await getLeaveRequestById(id);
   assertValidDateRange(start_date, end_date);
-  await assertLeaveTypeExists(leave_type_id);
+  const leaveType = await assertLeaveTypeExists(leave_type_id);
 
-  await leaveRequestRepository.update(id, { leave_type_id, start_date, end_date, reason });
+  const effectiveReportFile = report_file !== undefined ? report_file : existing.report_file;
+  assertReportProvided(leaveType, effectiveReportFile);
+
+  await leaveRequestRepository.update(id, { leave_type_id, start_date, end_date, reason, report_file });
   return leaveRequestRepository.findById(id);
 }
 

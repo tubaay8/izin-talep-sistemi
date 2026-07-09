@@ -4,13 +4,63 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kullanici Yonetimi - Izin Talep Sistemi</title>
-  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/style.css?v=7" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#0f172a" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
   <link rel="icon" href="/icons/favicon-32.png" type="image/png" />
 </head>
-<body>
+<body class="admin-layout">
+  <aside class="admin-sidebar" id="admin-sidebar">
+    <div class="sidebar-profile">
+      <span class="sidebar-avatar" id="sidebar-avatar">İT</span>
+      <strong class="sidebar-profile-name" id="sidebar-profile-name">...</strong>
+      <span class="sidebar-profile-email" id="sidebar-profile-email">...</span>
+    </div>
+    <nav class="sidebar-menu">
+      <a href="/dashboard" class="sidebar-link">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span class="sidebar-label">Dashboard</span>
+      </a>
+      <a href="/admin/users" class="sidebar-link active">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 13.5c2.8.3 5 2.5 5 5.5"/></svg>
+        <span class="sidebar-label">Kullanıcı Yönetimi</span>
+      </a>
+      <a href="/admin/leave-requests" class="sidebar-link">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+        <span class="sidebar-label">Tüm İzin Talepleri</span>
+      </a>
+      <a href="/admin/departments" class="sidebar-link">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/></svg>
+        <span class="sidebar-label">Departman Yönetimi</span>
+      </a>
+      <a href="/admin/leave-types" class="sidebar-link">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+        <span class="sidebar-label">İzin Türü Yönetimi</span>
+      </a>
+      <a href="/admin/reports" class="sidebar-link">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/><path d="M2 20h20"/></svg>
+        <span class="sidebar-label">Raporlar</span>
+      </a>
+    </nav>
+    <button type="button" class="sidebar-logout" id="sidebar-logout-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      <span class="sidebar-label">Çıkış Yap</span>
+    </button>
+  </aside>
+
+  <header class="dashboard-header">
+    <h1><span class="brand-logo">İT</span> İzin Talep Sistemi</h1>
+    <div class="dashboard-header-user">
+      <span>Hosgeldin, <strong id="user-name">...</strong></span>
+      <span id="role-badge" class="role-badge"></span>
+      <button id="logout-btn" class="logout-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        Çıkış Yap
+      </button>
+    </div>
+  </header>
+
   <main class="page-card">
     <div class="page-header">
       <h1><span class="brand-logo">İT</span> Kullanici Yonetimi</h1>
@@ -73,7 +123,8 @@
       </table>
     </div>
   </main>
-  <script src="/js/admin-users.js"></script>
+  <script src="/js/admin-users.js?v=2"></script>
+  <script src="/js/adminSidebar.js"></script>
   <script src="/js/sw-register.js"></script>
 </body>
 </html>

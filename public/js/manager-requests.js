@@ -53,10 +53,10 @@ function renderRow(request) {
   const actions = [];
   if (request.status === 'pending') {
     actions.push(
-      `<button data-decision="approved" data-id="${request.id}" class="link-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Onayla</button>`
+      `<button data-decision="approved" data-id="${request.id}" class="btn-approve"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Onayla</button>`
     );
     actions.push(
-      `<button data-decision="rejected" data-id="${request.id}" class="link-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Reddet</button>`
+      `<button data-decision="rejected" data-id="${request.id}" class="btn-reject"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Reddet</button>`
     );
   }
 
@@ -67,7 +67,8 @@ function renderRow(request) {
     <td>${formatDate(request.end_date)}</td>
     <td>${request.reason || '-'}</td>
     <td><span class="status-badge status-${request.status}">${STATUS_LABELS[request.status]}</span></td>
-    <td>${actions.join(' | ') || '-'}</td>
+    <td>${request.report_file ? `<a href="/api/leave-requests/${request.id}/report" target="_blank" class="report-badge">Raporu Görüntüle</a>` : '-'}</td>
+    <td>${actions.length ? `<div class="quick-actions">${actions.join('')}</div>` : '-'}</td>
   `;
   return tr;
 }

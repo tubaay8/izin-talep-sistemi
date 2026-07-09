@@ -35,6 +35,10 @@ app.use(
   })
 );
 
+// Yuklenen saglik raporlari sadece yetkilendirilmis API route'u uzerinden
+// (/api/leave-requests/:id/report) sunulur; dogrudan statik erisim engellenir.
+app.use('/uploads', (req, res) => res.status(404).json({ message: 'Bulunamadi' }));
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.use('/api/auth', authRoutes);

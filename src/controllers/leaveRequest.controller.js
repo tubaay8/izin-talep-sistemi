@@ -1,16 +1,21 @@
+const path = require('path');
 const leaveRequestService = require('../services/leaveRequest.service');
 const leaveRequestPdfService = require('../services/leaveRequestPdf.service');
 const { buildLeaveFormPdf } = require('../utils/leaveFormPdfBuilder');
 
+const REPORTS_DIR = path.join(__dirname, '..', '..', 'public', 'uploads', 'reports');
+
 async function create(req, res) {
   try {
     const { leave_type_id, start_date, end_date, reason } = req.body;
+    const report_file = req.file ? req.file.filename : undefined;
     const request = await leaveRequestService.createLeaveRequest({
       user_id: req.session.user.id,
       leave_type_id,
       start_date,
       end_date,
       reason,
+      report_file,
     });
     res.status(201).json({ message: 'Izin talebi olusturuldu', request });
   } catch (err) {
@@ -41,11 +46,13 @@ async function getOne(req, res) {
 async function update(req, res) {
   try {
     const { leave_type_id, start_date, end_date, reason } = req.body;
+    const report_file = req.file ? req.file.filename : undefined;
     const request = await leaveRequestService.updateLeaveRequest(req.params.id, req.session.user.id, {
       leave_type_id,
       start_date,
       end_date,
       reason,
+      report_file,
     });
     res.json({ message: 'Izin talebi guncellendi', request });
   } catch (err) {
@@ -76,4 +83,16 @@ async function downloadPdf(req, res) {
   }
 }
 
-module.exports = { create, listMine, getOne, update, cancel, downloadPdf };
+async function downloadReport(req, res) {
+  try {
+    const request = await leaveRequestPdfService.getLeaveRequestForPdf(req.params.id, req.session.user);
+    if (!request.report_file) {
+      return res.status(404).json({ message: 'Bu talebe ait rapor bulunamiyor' });
+    }
+    res.sendFile(path.join(REPORTS_DIR, request.report_file));
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
+}
+
+module.exports = { create, listMine, getOne, update, cancel, downloadPdf, downloadReport };

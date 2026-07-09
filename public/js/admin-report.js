@@ -68,7 +68,7 @@ function renderRow(request) {
     <td>${formatDate(request.start_date)}</td>
     <td>${formatDate(request.end_date)}</td>
     <td><span class="status-badge status-${request.status}">${STATUS_LABELS[request.status]}</span></td>
-    <td class="no-print"><a href="/api/leave-requests/${request.id}/pdf" class="link-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M12 10v6M9.5 13.5L12 16l2.5-2.5"/></svg>PDF Formu Indir</a></td>
+    <td class="no-print"><a href="/api/leave-requests/${request.id}/pdf" class="report-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M12 10v6M9.5 13.5L12 16l2.5-2.5"/></svg>PDF Formu Indir</a></td>
   `;
   return tr;
 }

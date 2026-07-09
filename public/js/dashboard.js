@@ -12,20 +12,41 @@ const ICONS = {
   userPlus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><path d="M19 8v6M16 11h6"/></svg>',
   arrowRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
   plusCircle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
+  grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
+  calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
+  barChart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/><path d="M2 20h20"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>',
 };
 
-const ACTIVITY_ICONS = {
-  'leave_request.created': 'plusCircle',
-  'leave_request.updated': 'list',
-  'leave_request.cancelled': 'ban',
-  'leave_request.approved': 'check',
-  'leave_request.rejected': 'x',
-  'leave_request.reopened': 'clock',
-  'user.created': 'userPlus',
-  'user.activated': 'userCheck',
-  'user.deactivated': 'userX',
-  'user.role_changed': 'users',
-  'user.department_changed': 'building',
+const ACTIVITY_STYLE = {
+  'leave_request.created': { icon: 'plusCircle', tone: 'tone-info' },
+  'leave_request.updated': { icon: 'edit', tone: 'tone-pending' },
+  'leave_request.cancelled': { icon: 'ban', tone: 'tone-cancelled' },
+  'leave_request.approved': { icon: 'check', tone: 'tone-approved' },
+  'leave_request.rejected': { icon: 'x', tone: 'tone-rejected' },
+  'leave_request.reopened': { icon: 'clock', tone: 'tone-info' },
+  'user.created': { icon: 'userPlus', tone: 'tone-info' },
+  'user.activated': { icon: 'userCheck', tone: 'tone-approved' },
+  'user.deactivated': { icon: 'userX', tone: 'tone-rejected' },
+  'user.role_changed': { icon: 'users', tone: 'tone-pending' },
+  'user.department_changed': { icon: 'building', tone: 'tone-pending' },
+};
+
+const LEAVE_ACTIVITY_TITLES = {
+  'leave_request.created': 'Talebi Oluşturuldu',
+  'leave_request.updated': 'Talebi Güncellendi',
+  'leave_request.cancelled': 'Talebi İptal Edildi',
+  'leave_request.approved': 'Talebi Onaylandı',
+  'leave_request.rejected': 'Talebi Reddedildi',
+  'leave_request.reopened': 'Talebi Tekrar Beklemeye Alındı',
+};
+
+const USER_ACTIVITY_TITLES = {
+  'user.created': 'Yeni Kullanıcı',
+  'user.activated': 'Kullanıcı Aktifleştirildi',
+  'user.deactivated': 'Kullanıcı Pasifleştirildi',
+  'user.role_changed': 'Kullanıcı Rolü Değiştirildi',
+  'user.department_changed': 'Kullanıcı Departmanı Değiştirildi',
 };
 
 const STATUS_LABELS = {
@@ -65,37 +86,147 @@ function quickLink(href, icon, label) {
   return `<a class="quick-link" href="${href}"><span>${label}</span>${ICONS[icon]}</a>`;
 }
 
+function sidebarLink(href, icon, label, active) {
+  return `<a href="${href}" class="sidebar-link${active ? ' active' : ''}">${ICONS[icon]}<span class="sidebar-label">${label}</span></a>`;
+}
+
+function populateSidebarProfile(user) {
+  const sidebarAvatar = document.getElementById('sidebar-avatar');
+  const sidebarName = document.getElementById('sidebar-profile-name');
+  const sidebarEmail = document.getElementById('sidebar-profile-email');
+  if (!sidebarAvatar || !sidebarName || !sidebarEmail) return;
+
+  const initials = user.full_name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join('');
+  sidebarAvatar.textContent = initials;
+  sidebarName.textContent = user.full_name;
+  sidebarEmail.textContent = user.email;
+}
+
 function emptyState(text) {
   return `<p class="empty-state">${text}</p>`;
 }
 
-function formatDateTime(value) {
-  return new Date(value).toLocaleString('tr-TR');
+function formatActivityTime(value) {
+  const date = new Date(value);
+  const now = new Date();
+  const time = date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+  const isToday =
+    date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
+  return isToday ? `Bugün ${time}` : `${formatDate(value)} ${time}`;
+}
+
+function parseLeaveRequestDetails(activity) {
+  const desc = activity.description || '';
+  let leaveType = null;
+  let dateRange = null;
+  let employeeName = null;
+
+  const dateMatch = desc.match(/:\s*(.+?)\s*\((\d{4}-\d{2}-\d{2})\s*-\s*(\d{4}-\d{2}-\d{2})\)/);
+  if (dateMatch) {
+    leaveType = dateMatch[1];
+    dateRange = `${formatDate(dateMatch[2])} - ${formatDate(dateMatch[3])}`;
+  } else {
+    const nameMatch = desc.match(/:\s*(.+?)\s*\(([^)]+)\)\s*$/);
+    if (nameMatch) {
+      leaveType = nameMatch[1];
+      employeeName = nameMatch[2];
+    } else {
+      const plainMatch = desc.match(/:\s*(.+)$/);
+      if (plainMatch) leaveType = plainMatch[1].trim();
+    }
+  }
+
+  return {
+    leaveType: leaveType || 'İzin Talebi',
+    dateRange,
+    employeeName: employeeName || activity.actor_name,
+  };
+}
+
+function activityCard(activity) {
+  const style = ACTIVITY_STYLE[activity.action_type] || { icon: 'list', tone: 'tone-neutral' };
+  const isLeaveActivity = activity.action_type.startsWith('leave_request.');
+
+  let title;
+  let detailsHtml;
+
+  if (isLeaveActivity) {
+    const { leaveType, dateRange, employeeName } = parseLeaveRequestDetails(activity);
+    title = `${leaveType} ${LEAVE_ACTIVITY_TITLES[activity.action_type] || ''}`;
+    detailsHtml = `
+      <div class="activity-details">
+        <span class="activity-employee">${employeeName}</span>
+        ${dateRange ? `<span>${dateRange}</span>` : ''}
+      </div>
+      <span class="activity-leave-badge">${leaveType}</span>
+    `;
+  } else {
+    title = USER_ACTIVITY_TITLES[activity.action_type] || activity.description;
+    detailsHtml = `<div class="activity-details"><span>${activity.description}</span></div>`;
+  }
+
+  return `
+    <div class="activity-card">
+      <div class="activity-icon-wrap ${style.tone}">${ICONS[style.icon]}</div>
+      <div class="activity-content">
+        <div class="activity-top">
+          <h3 class="activity-title">${title}</h3>
+          <span class="activity-time">${formatActivityTime(activity.created_at)}</span>
+        </div>
+        ${detailsHtml}
+      </div>
+    </div>
+  `;
 }
 
 function buildActivityPanel(activities) {
-  const items = activities.length
-    ? activities
-        .map(
-          (a) => `
-      <li class="activity-item">
-        <div class="activity-icon">${ICONS[ACTIVITY_ICONS[a.action_type] || 'list']}</div>
-        <div class="activity-body">
-          <p class="activity-desc">${a.description}</p>
-          <p class="activity-meta">${a.actor_name} (${a.actor_role}) &middot; ${formatDateTime(a.created_at)}</p>
-        </div>
-      </li>`
-        )
-        .join('')
-    : '';
+  if (!activities.length) {
+    return `
+      <div class="panel">
+        <div class="panel-header"><h2>${ICONS.clock}Son Aktiviteler</h2></div>
+        ${emptyState('Henuz aktivite bulunmuyor.')}
+      </div>
+    `;
+  }
+
+  const visibleCount = 8;
+  const initial = activities.slice(0, visibleCount);
+  const rest = activities.slice(visibleCount);
 
   return `
     <div class="panel">
       <div class="panel-header"><h2>${ICONS.clock}Son Aktiviteler</h2></div>
-      ${activities.length ? `<ul class="activity-feed">${items}</ul>` : emptyState('Henuz aktivite bulunmuyor.')}
+      <div class="activity-timeline" id="activity-timeline">
+        ${initial.map(activityCard).join('')}
+      </div>
+      ${
+        rest.length
+          ? `<div id="activity-hidden" hidden>${rest.map(activityCard).join('')}</div>
+             <div class="activity-footer">
+               <button type="button" class="btn-view-all-activities" id="btn-view-all-activities">Tüm Aktiviteleri Gör</button>
+             </div>`
+          : ''
+      }
     </div>
   `;
 }
+
+document.addEventListener('click', (event) => {
+  const btn = event.target.closest('#btn-view-all-activities');
+  if (!btn) return;
+  const hidden = document.getElementById('activity-hidden');
+  const timeline = document.getElementById('activity-timeline');
+  if (hidden && timeline) {
+    timeline.insertAdjacentHTML('beforeend', hidden.innerHTML);
+    hidden.remove();
+  }
+  btn.closest('.activity-footer').remove();
+});
 
 function renderPersonnelDashboard(user, data) {
   document.getElementById('stats-grid').innerHTML = [
@@ -132,15 +263,12 @@ function renderPersonnelDashboard(user, data) {
     ${buildActivityPanel(data.activities)}
   `;
 
-  document.getElementById('quick-links').innerHTML = [
-    quickLink('/leave-requests', 'arrowRight', 'Tum Izin Taleplerim'),
-    quickLink('/leave-requests/report', 'arrowRight', 'Izin Raporum'),
+  document.getElementById('sidebar-menu').innerHTML = [
+    sidebarLink('/dashboard', 'grid', 'Dashboard', true),
+    sidebarLink('/leave-requests', 'list', 'Izin Taleplerim', false),
+    sidebarLink('/leave-requests/new', 'plusCircle', 'Yeni Izin Talebi', false),
+    sidebarLink('/leave-requests/report', 'barChart', 'Izin Raporum', false),
   ].join('');
-
-  const primaryAction = document.getElementById('primary-action');
-  primaryAction.innerHTML = `${ICONS.plusCircle}Yeni Izin Talebi Olustur`;
-  primaryAction.href = '/leave-requests/new';
-  primaryAction.hidden = false;
 }
 
 async function submitManagerDecision(id, decision) {
@@ -184,6 +312,7 @@ function renderManagerDashboard(user, data) {
         <td>${r.leave_type_name}</td>
         <td>${formatDate(r.start_date)} - ${formatDate(r.end_date)}</td>
         <td>${statusBadge(r.status)}</td>
+        <td>${r.report_file ? `<a href="/api/leave-requests/${r.id}/report" target="_blank" class="report-badge">Raporu Gör</a>` : '-'}</td>
         <td>${
           r.status === 'pending'
             ? `<div class="quick-actions">
@@ -202,7 +331,7 @@ function renderManagerDashboard(user, data) {
       <div class="panel-header"><h2>${ICONS.list}Son Gelen Izin Talepleri</h2></div>
       ${
         data.recent.length
-          ? `<div class="table-scroll"><table class="data-table"><thead><tr><th>Personel</th><th>Izin Turu</th><th>Tarih</th><th>Durum</th><th>Islemler</th></tr></thead><tbody id="manager-recent-body">${rows}</tbody></table></div>`
+          ? `<div class="table-scroll"><table class="data-table"><thead><tr><th>Personel</th><th>Izin Turu</th><th>Tarih</th><th>Durum</th><th>Rapor</th><th>Islemler</th></tr></thead><tbody id="manager-recent-body">${rows}</tbody></table></div>`
           : emptyState('Ekibinize ait izin talebi bulunmuyor.')
       }
     </div>
@@ -222,35 +351,14 @@ function renderManagerDashboard(user, data) {
     });
   }
 
-  document.getElementById('quick-links').innerHTML = [
-    quickLink('/manager/leave-requests', 'arrowRight', 'Tum Ekip Talepleri'),
-    quickLink('/manager/reports', 'arrowRight', 'Ekip Izin Raporu'),
+  document.getElementById('sidebar-menu').innerHTML = [
+    sidebarLink('/dashboard', 'grid', 'Dashboard', true),
+    sidebarLink('/manager/leave-requests', 'list', 'Ekip Talepleri', false),
+    sidebarLink('/manager/reports', 'barChart', 'Ekip Izin Raporu', false),
   ].join('');
-
-  const primaryAction = document.getElementById('primary-action');
-  primaryAction.innerHTML = `${ICONS.users}Ekip Taleplerini Gor`;
-  primaryAction.href = '/manager/leave-requests';
-  primaryAction.hidden = false;
 }
 
 function renderAdminDashboard(user, data) {
-  document.body.classList.add('admin-layout');
-
-  const sidebarAvatar = document.getElementById('sidebar-avatar');
-  const sidebarName = document.getElementById('sidebar-profile-name');
-  const sidebarEmail = document.getElementById('sidebar-profile-email');
-  if (sidebarAvatar && sidebarName && sidebarEmail) {
-    const initials = user.full_name
-      .split(' ')
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0].toUpperCase())
-      .join('');
-    sidebarAvatar.textContent = initials;
-    sidebarName.textContent = user.full_name;
-    sidebarEmail.textContent = user.email;
-  }
-
   const mostUsed = data.stats.mostUsedLeaveType;
 
   document.getElementById('stats-grid').innerHTML = [
@@ -281,6 +389,7 @@ function renderAdminDashboard(user, data) {
         <td>${r.leave_type_name}</td>
         <td>${formatDate(r.start_date)} - ${formatDate(r.end_date)}</td>
         <td>${statusBadge(r.status)}</td>
+        <td>${r.report_file ? `<a href="/api/leave-requests/${r.id}/report" target="_blank" class="report-badge">Raporu Gör</a>` : '-'}</td>
       </tr>`
         )
         .join('')
@@ -306,7 +415,7 @@ function renderAdminDashboard(user, data) {
       <div class="panel-header"><h2>${ICONS.list}Son Olusturulan Izin Talepleri</h2></div>
       ${
         data.recentRequests.length
-          ? `<div class="table-scroll"><table class="data-table"><thead><tr><th>Personel</th><th>Departman</th><th>Izin Turu</th><th>Tarih</th><th>Durum</th></tr></thead><tbody>${requestRows}</tbody></table></div>`
+          ? `<div class="table-scroll"><table class="data-table"><thead><tr><th>Personel</th><th>Departman</th><th>Izin Turu</th><th>Tarih</th><th>Durum</th><th>Rapor</th></tr></thead><tbody>${requestRows}</tbody></table></div>`
           : emptyState('Henuz izin talebi bulunmuyor.')
       }
     </div>
@@ -321,10 +430,14 @@ function renderAdminDashboard(user, data) {
     ${buildActivityPanel(data.activities)}
   `;
 
-  const primaryAction = document.getElementById('primary-action');
-  primaryAction.innerHTML = `${ICONS.building}Kullanici Yonetimine Git`;
-  primaryAction.href = '/admin/users';
-  primaryAction.hidden = false;
+  document.getElementById('sidebar-menu').innerHTML = [
+    sidebarLink('/dashboard', 'grid', 'Dashboard', true),
+    sidebarLink('/admin/users', 'users', 'Kullanici Yonetimi', false),
+    sidebarLink('/admin/leave-requests', 'list', 'Tum Izin Talepleri', false),
+    sidebarLink('/admin/departments', 'building', 'Departman Yonetimi', false),
+    sidebarLink('/admin/leave-types', 'calendar', 'Izin Turu Yonetimi', false),
+    sidebarLink('/admin/reports', 'barChart', 'Raporlar', false),
+  ].join('');
 }
 
 async function loadDashboard() {
@@ -335,9 +448,11 @@ async function loadDashboard() {
       return;
     }
     const { user } = await meRes.json();
+    document.body.classList.add('admin-layout');
     document.getElementById('user-name').textContent = user.full_name;
     document.getElementById('role-badge').textContent = user.role_name;
     document.getElementById('role-content').textContent = ROLE_CONTENT[user.role_name] || '';
+    populateSidebarProfile(user);
 
     const statsRes = await fetch('/api/stats');
     if (!statsRes.ok) return;

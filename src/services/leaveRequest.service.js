@@ -1,6 +1,6 @@
 const leaveRequestRepository = require('../repositories/leaveRequest.repository');
 const userRepository = require('../repositories/user.repository');
-const { assertValidDateRange, assertLeaveTypeExists } = require('../utils/leaveRequestValidators');
+const { assertValidDateRange, assertLeaveTypeExists, assertReportProvided } = require('../utils/leaveRequestValidators');
 const activityLogService = require('./activityLog.service');
 
 async function getOwnedPendingRequest(id, userId) {
@@ -18,11 +18,12 @@ async function getOwnedPendingRequest(id, userId) {
   return request;
 }
 
-async function createLeaveRequest({ user_id, leave_type_id, start_date, end_date, reason }) {
+async function createLeaveRequest({ user_id, leave_type_id, start_date, end_date, reason, report_file }) {
   assertValidDateRange(start_date, end_date);
-  await assertLeaveTypeExists(leave_type_id);
+  const leaveType = await assertLeaveTypeExists(leave_type_id);
+  assertReportProvided(leaveType, report_file);
 
-  const id = await leaveRequestRepository.create({ user_id, leave_type_id, start_date, end_date, reason });
+  const id = await leaveRequestRepository.create({ user_id, leave_type_id, start_date, end_date, reason, report_file });
   const request = await leaveRequestRepository.findById(id);
 
   await activityLogService.log({
@@ -49,12 +50,15 @@ async function getMyLeaveRequestById(id, userId) {
   return request;
 }
 
-async function updateLeaveRequest(id, userId, { leave_type_id, start_date, end_date, reason }) {
+async function updateLeaveRequest(id, userId, { leave_type_id, start_date, end_date, reason, report_file }) {
   assertValidDateRange(start_date, end_date);
-  await assertLeaveTypeExists(leave_type_id);
-  await getOwnedPendingRequest(id, userId);
+  const leaveType = await assertLeaveTypeExists(leave_type_id);
+  const existing = await getOwnedPendingRequest(id, userId);
 
-  await leaveRequestRepository.update(id, { leave_type_id, start_date, end_date, reason });
+  const effectiveReportFile = report_file !== undefined ? report_file : existing.report_file;
+  assertReportProvided(leaveType, effectiveReportFile);
+
+  await leaveRequestRepository.update(id, { leave_type_id, start_date, end_date, reason, report_file });
   const request = await leaveRequestRepository.findById(id);
 
   await activityLogService.log({

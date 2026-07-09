@@ -21,6 +21,7 @@
     "express-validator": "^7.3.2",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
+    "multer": "^2.2.0",
     "mysql2": "^3.22.5",
     "pdfkit": "^0.19.1",
     "sweetalert2": "^11.26.25"

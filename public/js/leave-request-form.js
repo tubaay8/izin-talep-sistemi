@@ -3,6 +3,10 @@ const messageEl = document.getElementById('form-message');
 const leaveTypeSelect = document.getElementById('leave_type_id');
 const formTitle = document.getElementById('form-title');
 const submitBtn = document.getElementById('submit-btn');
+const reportUploadGroup = document.getElementById('report-upload-group');
+const reportFileInput = document.getElementById('report_file');
+const reportFileNameEl = document.getElementById('report-file-name');
+const reportExistingFileEl = document.getElementById('report-existing-file');
 
 const requestId = new URLSearchParams(window.location.search).get('id');
 const isEditMode = window.location.pathname === '/leave-requests/edit' && requestId;
@@ -12,6 +16,29 @@ if (isEditMode) {
   submitBtn.innerHTML =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Degisiklikleri Kaydet';
 }
+
+function isSickLeaveSelected() {
+  const selectedOption = leaveTypeSelect.selectedOptions[0];
+  if (!selectedOption) return false;
+  return selectedOption.textContent.toLowerCase().includes('hastal');
+}
+
+function updateReportFieldVisibility() {
+  const shouldShow = isSickLeaveSelected();
+  reportUploadGroup.classList.toggle('visible', shouldShow);
+  reportFileInput.required = shouldShow && !reportExistingFileEl.dataset.hasFile;
+}
+
+leaveTypeSelect.addEventListener('change', updateReportFieldVisibility);
+
+reportFileInput.addEventListener('change', () => {
+  reportFileNameEl.textContent = reportFileInput.files[0] ? reportFileInput.files[0].name : '';
+  if (reportFileInput.files[0]) {
+    reportFileInput.required = false;
+    messageEl.textContent = '';
+    messageEl.className = 'form-message';
+  }
+});
 
 async function loadLeaveTypes() {
   const res = await fetch('/api/leave-types');
@@ -46,6 +73,14 @@ async function loadExistingRequest() {
   document.getElementById('start_date').value = data.request.start_date.slice(0, 10);
   document.getElementById('end_date').value = data.request.end_date.slice(0, 10);
   document.getElementById('reason').value = data.request.reason || '';
+
+  if (data.request.report_file) {
+    reportExistingFileEl.innerHTML = `Mevcut rapor: <a href="/api/leave-requests/${requestId}/report" target="_blank">Raporu Görüntüle</a>`;
+    reportExistingFileEl.hidden = false;
+    reportExistingFileEl.dataset.hasFile = 'true';
+  }
+
+  updateReportFieldVisibility();
 }
 
 form.addEventListener('submit', async (event) => {
@@ -53,22 +88,20 @@ form.addEventListener('submit', async (event) => {
   messageEl.textContent = '';
   messageEl.className = 'form-message';
 
-  const payload = {
-    leave_type_id: leaveTypeSelect.value,
-    start_date: document.getElementById('start_date').value,
-    end_date: document.getElementById('end_date').value,
-    reason: document.getElementById('reason').value,
-  };
+  const formData = new FormData();
+  formData.append('leave_type_id', leaveTypeSelect.value);
+  formData.append('start_date', document.getElementById('start_date').value);
+  formData.append('end_date', document.getElementById('end_date').value);
+  formData.append('reason', document.getElementById('reason').value);
+  if (reportFileInput.files[0]) {
+    formData.append('report_file', reportFileInput.files[0]);
+  }
 
   const url = isEditMode ? `/api/leave-requests/${requestId}` : '/api/leave-requests';
   const method = isEditMode ? 'PUT' : 'POST';
 
   try {
-    const res = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    const res = await fetch(url, { method, body: formData });
     const data = await res.json();
 
     if (!res.ok) {
@@ -88,5 +121,7 @@ form.addEventListener('submit', async (event) => {
 loadLeaveTypes().then(() => {
   if (isEditMode) {
     loadExistingRequest();
+  } else {
+    updateReportFieldVisibility();
   }
 });

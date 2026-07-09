@@ -21,8 +21,8 @@ function renderViewRow(type) {
     <td>${type.description || '-'}</td>
     <td>
       <div class="quick-actions">
-        <button class="link-btn" data-action="edit">${ICON_EDIT}Duzenle</button>
-        <button class="link-btn" data-action="delete">${ICON_TRASH}Sil</button>
+        <button class="btn-edit" data-action="edit">${ICON_EDIT}Duzenle</button>
+        <button class="btn-delete" data-action="delete">${ICON_TRASH}Sil</button>
       </div>
     </td>
   `;
@@ -37,8 +37,8 @@ function renderEditRow(type) {
     <td><input type="text" class="edit-description-input" value="${type.description || ''}" /></td>
     <td>
       <div class="quick-actions">
-        <button class="link-btn" data-action="save">${ICON_CHECK}Kaydet</button>
-        <button class="link-btn" data-action="cancel">${ICON_X}Iptal</button>
+        <button class="btn-save" data-action="save">${ICON_CHECK}Kaydet</button>
+        <button class="btn-cancel" data-action="cancel">${ICON_X}Iptal</button>
       </div>
     </td>
   `;

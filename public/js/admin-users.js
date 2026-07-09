@@ -61,7 +61,7 @@ function renderRow(user) {
     <td>${user.department_name}</td>
     <td>${user.manager_name || '-'}</td>
     <td><span class="status-badge ${user.is_active ? 'status-approved' : 'status-rejected'}">${user.is_active ? 'Aktif' : 'Pasif'}</span></td>
-    <td><a href="/admin/users/edit?id=${user.id}" class="link-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>Duzenle</a></td>
+    <td><a href="/admin/users/edit?id=${user.id}" class="btn-edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>Duzenle</a></td>
   `;
   return tr;
 }

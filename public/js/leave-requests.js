@@ -43,10 +43,10 @@ function renderRow(request) {
   const actions = [];
   if (request.status === 'pending') {
     actions.push(
-      `<a href="/leave-requests/edit?id=${request.id}" class="link-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>Duzenle</a>`
+      `<a href="/leave-requests/edit?id=${request.id}" class="btn-edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>Duzenle</a>`
     );
     actions.push(
-      `<button data-cancel-id="${request.id}" class="link-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M6.5 6.5l11 11"/></svg>Iptal Et</button>`
+      `<button data-cancel-id="${request.id}" class="btn-cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M6.5 6.5l11 11"/></svg>Iptal Et</button>`
     );
   }
 
@@ -56,7 +56,8 @@ function renderRow(request) {
     <td>${formatDate(request.end_date)}</td>
     <td>${request.reason || '-'}</td>
     <td><span class="status-badge status-${request.status}">${STATUS_LABELS[request.status]}</span></td>
-    <td>${actions.join(' | ') || '-'}</td>
+    <td>${request.report_file ? `<a href="/api/leave-requests/${request.id}/report" target="_blank" class="report-badge">Raporu Görüntüle</a>` : '-'}</td>
+    <td>${actions.length ? `<div class="quick-actions">${actions.join('')}</div>` : '-'}</td>
   `;
   return tr;
 }

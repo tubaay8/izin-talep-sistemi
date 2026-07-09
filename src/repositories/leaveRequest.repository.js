@@ -3,7 +3,7 @@ const { buildLeaveRequestFilters } = require('../utils/leaveRequestFilters');
 
 const SELECT_FIELDS = `
   lr.id, lr.user_id, lr.leave_type_id, lt.name AS leave_type_name,
-  lr.start_date, lr.end_date, lr.reason, lr.status,
+  lr.start_date, lr.end_date, lr.reason, lr.report_file, lr.status,
   lr.approved_by, lr.approval_note, lr.decided_at,
   lr.created_at, lr.updated_at
 `;
@@ -35,22 +35,31 @@ async function findById(id) {
   return rows[0] || null;
 }
 
-async function create({ user_id, leave_type_id, start_date, end_date, reason }) {
+async function create({ user_id, leave_type_id, start_date, end_date, reason, report_file }) {
   const [result] = await pool.query(
-    `INSERT INTO leave_requests (user_id, leave_type_id, start_date, end_date, reason)
-     VALUES (?, ?, ?, ?, ?)`,
-    [user_id, leave_type_id, start_date, end_date, reason || null]
+    `INSERT INTO leave_requests (user_id, leave_type_id, start_date, end_date, reason, report_file)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [user_id, leave_type_id, start_date, end_date, reason || null, report_file || null]
   );
   return result.insertId;
 }
 
-async function update(id, { leave_type_id, start_date, end_date, reason }) {
-  await pool.query(
-    `UPDATE leave_requests
-     SET leave_type_id = ?, start_date = ?, end_date = ?, reason = ?
-     WHERE id = ?`,
-    [leave_type_id, start_date, end_date, reason || null, id]
-  );
+async function update(id, { leave_type_id, start_date, end_date, reason, report_file }) {
+  if (report_file !== undefined) {
+    await pool.query(
+      `UPDATE leave_requests
+       SET leave_type_id = ?, start_date = ?, end_date = ?, reason = ?, report_file = ?
+       WHERE id = ?`,
+      [leave_type_id, start_date, end_date, reason || null, report_file, id]
+    );
+  } else {
+    await pool.query(
+      `UPDATE leave_requests
+       SET leave_type_id = ?, start_date = ?, end_date = ?, reason = ?
+       WHERE id = ?`,
+      [leave_type_id, start_date, end_date, reason || null, id]
+    );
+  }
 }
 
 async function cancel(id) {

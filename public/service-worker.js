@@ -1,4 +1,4 @@
-const CACHE_NAME = 'izin-talep-sistemi-v1';
+const CACHE_NAME = 'izin-talep-sistemi-v2';
 const OFFLINE_URL = '/offline.html';
 
 const PRECACHE_ASSETS = [
@@ -66,18 +66,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Statik dosyalar (CSS/JS/icon): once onbellekten hizli goster, arka planda
+  // guncelini indirip onbellegi tazele (stale-while-revalidate). Boylece dosya
+  // sunucuda degisince kullanici en fazla bir yenilemede guncel surumu gorur.
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request)
-        .then((response) => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => new Response('', { status: 504, statusText: 'Offline' }));
-    })
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.match(request).then((cached) => {
+        const networkFetch = fetch(request)
+          .then((response) => {
+            if (response.ok) {
+              cache.put(request, response.clone());
+            }
+            return response;
+          })
+          .catch(() => cached || new Response('', { status: 504, statusText: 'Offline' }));
+
+        return cached || networkFetch;
+      })
+    )
   );
 });

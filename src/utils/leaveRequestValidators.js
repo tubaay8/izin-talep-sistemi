@@ -15,6 +15,21 @@ async function assertLeaveTypeExists(leave_type_id) {
     error.status = 400;
     throw error;
   }
+  return leaveType;
 }
 
-module.exports = { assertValidDateRange, assertLeaveTypeExists };
+// "Hastalik/Hastalık" kelimesinin ı/i, İ/I gibi Turkce harf varyasyonlarindan
+// bagimsiz, ascii-guvenli bir alt dize ile eslesip eslesmedigini kontrol eder.
+function isReportRequired(leaveTypeName) {
+  return Boolean(leaveTypeName) && leaveTypeName.toLowerCase().includes('hastal');
+}
+
+function assertReportProvided(leaveType, reportFile) {
+  if (isReportRequired(leaveType.name) && !reportFile) {
+    const error = new Error('Hastalik izni icin saglik raporu yuklemeniz zorunludur');
+    error.status = 400;
+    throw error;
+  }
+}
+
+module.exports = { assertValidDateRange, assertLeaveTypeExists, isReportRequired, assertReportProvided };
