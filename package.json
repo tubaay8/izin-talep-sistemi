@@ -1,0 +1,31 @@
+{
+  "name": "izin-talep-sistemi",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "db:migrate": "node database/migrate.js",
+    "db:seed": "node database/seed.js",
+    "postinstall": "node scripts/sync-vendor-assets.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Izin Talep Sistemi - staj projesi",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "express-validator": "^7.3.2",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
+    "mysql2": "^3.22.5",
+    "pdfkit": "^0.19.1",
+    "sweetalert2": "^11.26.25"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

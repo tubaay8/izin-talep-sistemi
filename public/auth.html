@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giris / Kayit - Izin Talep Sistemi</title>
+  <link rel="stylesheet" href="/css/auth.css" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <link rel="icon" href="/icons/favicon-32.png" type="image/png" />
+</head>
+<body>
+  <div class="auth-card" id="auth-card">
+    <section class="form-panel form-panel--login">
+      <div class="form-inner">
+        <a href="/" class="auth-brand">
+          <span class="brand-logo">İT</span>
+          <span class="brand-name">İzin Talep Sistemi</span>
+        </a>
+        <h1>İzin Talep Sistemine Hoş Geldiniz</h1>
+        <p class="auth-subtitle">Devam etmek icin hesabiniza giris yapin.</p>
+
+        <form id="login-form">
+          <label for="login-email">E-posta</label>
+          <input type="email" id="login-email" name="email" required />
+
+          <label for="login-password">Sifre</label>
+          <input type="password" id="login-password" name="password" required />
+
+          <button type="submit" class="auth-submit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+            Giris Yap
+          </button>
+          <p id="login-message" class="auth-message"></p>
+        </form>
+
+        <p class="auth-switch">Hesabiniz yok mu? <button type="button" data-switch="register">Kayit Ol</button></p>
+      </div>
+    </section>
+
+    <section class="form-panel form-panel--register">
+      <div class="form-inner">
+        <a href="/" class="auth-brand">
+          <span class="brand-logo">İT</span>
+          <span class="brand-name">İzin Talep Sistemi</span>
+        </a>
+        <h1>Yeni Hesap Oluştur</h1>
+        <p class="auth-subtitle">Birkac bilgi ile hesabinizi olusturun.</p>
+
+        <form id="register-form">
+          <label for="register-full-name">Ad Soyad</label>
+          <input type="text" id="register-full-name" name="full_name" required />
+
+          <label for="register-email">E-posta</label>
+          <input type="email" id="register-email" name="email" required />
+
+          <label for="register-password">Sifre</label>
+          <input type="password" id="register-password" name="password" minlength="6" required />
+
+          <label for="register-password-confirm">Sifre (Tekrar)</label>
+          <input type="password" id="register-password-confirm" name="password_confirm" minlength="6" required />
+
+          <label for="register-department">Departman</label>
+          <select id="register-department" name="department_id" required>
+            <option value="">Seciniz...</option>
+          </select>
+
+          <label for="register-manager">Yoneticiniz (opsiyonel)</label>
+          <select id="register-manager" name="manager_id">
+            <option value="">Seciniz...</option>
+          </select>
+
+          <button type="submit" class="auth-submit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><path d="M19 8v6M16 11h6"/></svg>
+            Kayit Ol
+          </button>
+          <p id="register-message" class="auth-message"></p>
+        </form>
+
+        <p class="auth-switch">Zaten hesabiniz var mi? <button type="button" data-switch="login">Giris Yap</button></p>
+      </div>
+    </section>
+
+    <div class="overlay-panel">
+      <div class="overlay-inner overlay-inner--login">
+        <span class="brand-logo">İT</span>
+        <h2>İzin Talep Sistemi</h2>
+        <p>Kurumsal izin yonetim platformu. Henuz hesabiniz yok mu?</p>
+        <button type="button" class="overlay-btn" data-switch="register">Kayit Ol</button>
+      </div>
+      <div class="overlay-inner overlay-inner--register">
+        <span class="brand-logo">İT</span>
+        <h2>Tekrar Hos Geldiniz</h2>
+        <p>Zaten bir hesabiniz var mi? Giris yaparak devam edin.</p>
+        <button type="button" class="overlay-btn" data-switch="login">Giris Yap</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/sw-register.js"></script>
+</body>
+</html>

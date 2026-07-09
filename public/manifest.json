@@ -1,0 +1,18 @@
+{
+  "name": "İzin Talep Sistemi",
+  "short_name": "İzin",
+  "description": "Kurumsal izin talep ve onay yonetim sistemi",
+  "start_url": "/",
+  "scope": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "tr",
+  "theme_color": "#0f172a",
+  "background_color": "#dbeafe",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

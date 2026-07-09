@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kullanici Yonetimi - Izin Talep Sistemi</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <link rel="icon" href="/icons/favicon-32.png" type="image/png" />
+</head>
+<body>
+  <main class="page-card">
+    <div class="page-header">
+      <h1><span class="brand-logo">İT</span> Kullanici Yonetimi</h1>
+      <div>
+        <a href="/dashboard">Anasayfa</a>
+        <a href="/admin/users/new" class="btn-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          Yeni Kullanici
+        </a>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-field">
+        <label for="filter-search">Ara</label>
+        <input type="text" id="filter-search" placeholder="Isim veya e-posta..." />
+      </div>
+      <div class="filter-field">
+        <label for="filter-role">Rol</label>
+        <select id="filter-role">
+          <option value="">Tumu</option>
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="filter-department">Departman</label>
+        <select id="filter-department">
+          <option value="">Tumu</option>
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="filter-active">Durum</label>
+        <select id="filter-active">
+          <option value="">Tumu</option>
+          <option value="true">Aktif</option>
+          <option value="false">Pasif</option>
+        </select>
+      </div>
+      <button type="button" id="filter-clear" class="filter-clear">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 3v6h-6"/></svg>
+        Filtreleri Temizle
+      </button>
+    </div>
+
+    <p id="list-message" class="form-message"></p>
+
+    <div class="table-scroll">
+      <table class="data-table" id="users-table">
+        <thead>
+          <tr>
+            <th>Ad Soyad</th>
+            <th>E-posta</th>
+            <th>Rol</th>
+            <th>Departman</th>
+            <th>Yonetici</th>
+            <th>Durum</th>
+            <th>Islemler</th>
+          </tr>
+        </thead>
+        <tbody id="users-body"></tbody>
+      </table>
+    </div>
+  </main>
+  <script src="/js/admin-users.js"></script>
+  <script src="/js/sw-register.js"></script>
+</body>
+</html>

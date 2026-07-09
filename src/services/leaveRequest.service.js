@@ -1,0 +1,132 @@
+const leaveRequestRepository = require('../repositories/leaveRequest.repository');
+const userRepository = require('../repositories/user.repository');
+const { assertValidDateRange, assertLeaveTypeExists } = require('../utils/leaveRequestValidators');
+const activityLogService = require('./activityLog.service');
+
+async function getOwnedPendingRequest(id, userId) {
+  const request = await leaveRequestRepository.findById(id);
+  if (!request || request.user_id !== userId) {
+    const error = new Error('Izin talebi bulunamadi');
+    error.status = 404;
+    throw error;
+  }
+  if (request.status !== 'pending') {
+    const error = new Error('Sadece bekleyen talepler duzenlenebilir veya iptal edilebilir');
+    error.status = 409;
+    throw error;
+  }
+  return request;
+}
+
+async function createLeaveRequest({ user_id, leave_type_id, start_date, end_date, reason }) {
+  assertValidDateRange(start_date, end_date);
+  await assertLeaveTypeExists(leave_type_id);
+
+  const id = await leaveRequestRepository.create({ user_id, leave_type_id, start_date, end_date, reason });
+  const request = await leaveRequestRepository.findById(id);
+
+  await activityLogService.log({
+    actorId: user_id,
+    actionType: activityLogService.ACTION_TYPES.LEAVE_REQUEST_CREATED,
+    description: `Izin talebi olusturuldu: ${request.leave_type_name} (${request.start_date} - ${request.end_date})`,
+    targetUserId: user_id,
+  });
+
+  return request;
+}
+
+async function getMyLeaveRequests(userId, filters) {
+  return leaveRequestRepository.findAllByUserId(userId, filters);
+}
+
+async function getMyLeaveRequestById(id, userId) {
+  const request = await leaveRequestRepository.findById(id);
+  if (!request || request.user_id !== userId) {
+    const error = new Error('Izin talebi bulunamadi');
+    error.status = 404;
+    throw error;
+  }
+  return request;
+}
+
+async function updateLeaveRequest(id, userId, { leave_type_id, start_date, end_date, reason }) {
+  assertValidDateRange(start_date, end_date);
+  await assertLeaveTypeExists(leave_type_id);
+  await getOwnedPendingRequest(id, userId);
+
+  await leaveRequestRepository.update(id, { leave_type_id, start_date, end_date, reason });
+  const request = await leaveRequestRepository.findById(id);
+
+  await activityLogService.log({
+    actorId: userId,
+    actionType: activityLogService.ACTION_TYPES.LEAVE_REQUEST_UPDATED,
+    description: `Izin talebi guncellendi: ${request.leave_type_name} (${request.start_date} - ${request.end_date})`,
+    targetUserId: userId,
+  });
+
+  return request;
+}
+
+async function cancelLeaveRequest(id, userId) {
+  const existing = await getOwnedPendingRequest(id, userId);
+  await leaveRequestRepository.cancel(id);
+  const request = await leaveRequestRepository.findById(id);
+
+  await activityLogService.log({
+    actorId: userId,
+    actionType: activityLogService.ACTION_TYPES.LEAVE_REQUEST_CANCELLED,
+    description: `Izin talebi iptal edildi: ${existing.leave_type_name}`,
+    targetUserId: userId,
+  });
+
+  return request;
+}
+
+async function getTeamLeaveRequests(managerId, filters) {
+  return leaveRequestRepository.findAllByManagerId(managerId, filters);
+}
+
+async function decideLeaveRequest(id, managerId, { decision, approval_note }) {
+  const request = await leaveRequestRepository.findById(id);
+  if (!request) {
+    const error = new Error('Izin talebi bulunamadi');
+    error.status = 404;
+    throw error;
+  }
+
+  const employee = await userRepository.findById(request.user_id);
+  if (!employee || employee.manager_id !== managerId) {
+    const error = new Error('Bu talep uzerinde yetkiniz yok');
+    error.status = 403;
+    throw error;
+  }
+
+  if (request.status !== 'pending') {
+    const error = new Error('Sadece bekleyen talepler onaylanabilir veya reddedilebilir');
+    error.status = 409;
+    throw error;
+  }
+
+  await leaveRequestRepository.decide(id, { status: decision, approved_by: managerId, approval_note });
+  const updated = await leaveRequestRepository.findById(id);
+
+  await activityLogService.log({
+    actorId: managerId,
+    actionType:
+      decision === 'approved' ? activityLogService.ACTION_TYPES.LEAVE_REQUEST_APPROVED : activityLogService.ACTION_TYPES.LEAVE_REQUEST_REJECTED,
+    description: `Izin talebi ${decision === 'approved' ? 'onaylandi' : 'reddedildi'}: ${updated.leave_type_name} (${employee.full_name})`,
+    targetUserId: request.user_id,
+  });
+
+  return updated;
+}
+
+module.exports = {
+  createLeaveRequest,
+  getMyLeaveRequests,
+  getMyLeaveRequestById,
+  updateLeaveRequest,
+  cancelLeaveRequest,
+  getTeamLeaveRequests,
+  decideLeaveRequest,
+};

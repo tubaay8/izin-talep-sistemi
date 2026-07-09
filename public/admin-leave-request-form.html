@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Izin Talebini Duzenle - Izin Talep Sistemi</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <link rel="icon" href="/icons/favicon-32.png" type="image/png" />
+</head>
+<body>
+  <main class="form-card">
+    <h1>Izin Talebini Duzenle</h1>
+    <p id="employee-info"></p>
+    <form id="leave-request-form">
+      <label for="leave_type_id">Izin Turu</label>
+      <select id="leave_type_id" name="leave_type_id" required>
+        <option value="">Seciniz...</option>
+      </select>
+
+      <label for="start_date">Baslangic Tarihi</label>
+      <input type="date" id="start_date" name="start_date" required />
+
+      <label for="end_date">Bitis Tarihi</label>
+      <input type="date" id="end_date" name="end_date" required />
+
+      <label for="reason">Aciklama</label>
+      <input type="text" id="reason" name="reason" maxlength="500" />
+
+      <button type="submit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+        Degisiklikleri Kaydet
+      </button>
+      <p id="form-message" class="form-message"></p>
+    </form>
+    <p><a href="/admin/leave-requests">&larr; Tum Izin Taleplerine Don</a></p>
+  </main>
+  <script src="/js/admin-leave-request-form.js"></script>
+  <script src="/js/sw-register.js"></script>
+</body>
+</html>

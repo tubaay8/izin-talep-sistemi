@@ -1,0 +1,49 @@
+const adminUserService = require('../services/adminUser.service');
+
+async function list(req, res) {
+  const { search, role_id, department_id, is_active } = req.query;
+  const users = await adminUserService.getAllUsers({ search, role_id, department_id, is_active });
+  res.json({ users });
+}
+
+async function getOne(req, res) {
+  try {
+    const user = await adminUserService.getUserById(req.params.id);
+    res.json({ user });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
+}
+
+async function create(req, res) {
+  try {
+    const { full_name, email, password, role_id, department_id, manager_id } = req.body;
+    const user = await adminUserService.createUser(
+      { full_name, email, password, role_id, department_id, manager_id },
+      req.session.user.id
+    );
+    res.status(201).json({ message: 'Kullanici olusturuldu', user });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
+}
+
+async function update(req, res) {
+  try {
+    const { full_name, email, role_id, department_id, manager_id, is_active, password } = req.body;
+    const user = await adminUserService.updateUser(req.params.id, req.session.user.id, {
+      full_name,
+      email,
+      role_id,
+      department_id,
+      manager_id,
+      is_active,
+      password,
+    });
+    res.json({ message: 'Kullanici guncellendi', user });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
+}
+
+module.exports = { list, getOne, create, update };
