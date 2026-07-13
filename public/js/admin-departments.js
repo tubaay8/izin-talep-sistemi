@@ -174,7 +174,7 @@ tbody.addEventListener('click', async (event) => {
       text: `"${dept.name}" departmanini silmek istediginize emin misiniz?`,
       icon: 'warning',
       confirmText: 'Evet, Sil',
-      confirmColor: '#C94C4C',
+      confirmColor: '#D9534F',
     });
     if (!confirmed) return;
 

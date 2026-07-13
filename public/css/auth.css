@@ -1,11 +1,13 @@
 :root {
-  --auth-primary: #8C6A4A;
-  --auth-primary-hover: #A27854;
-  --auth-navy: #3B2F2A;
-  --auth-light: #F3E6D8;
-  --auth-text: #5E534C;
-  --auth-muted: #8E847D;
-  --auth-border: #E7DDD4;
+  --auth-primary: #8C6E63;
+  --auth-primary-hover: #3E2522;
+  --auth-navy: #3E2522;
+  --auth-light: #FBEFE2;
+  --auth-text: #3E2522;
+  --auth-muted: #8C6E63;
+  --auth-border: #DCC4A8;
+  --auth-input-bg: #FFFDF9;
+  --auth-input-border: #D8C7B7;
   --auth-radius: 20px;
   --auth-radius-sm: 14px;
 }
@@ -28,7 +30,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  background: linear-gradient(160deg, #F8F6F3 0%, #F2ECE6 100%);
+  background: linear-gradient(160deg, #FBEADA 0%, #FFE0B2 100%);
 }
 
 .back-home-btn {
@@ -47,12 +49,12 @@ body {
   font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none;
-  box-shadow: 0 4px 16px rgba(59, 47, 42, 0.1);
+  box-shadow: 0 4px 16px rgba(62, 37, 34, 0.12);
   transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
 .back-home-btn:hover {
-  background: #F8F6F3;
+  background: #FBEADA;
   transform: translateX(-2px);
 }
 
@@ -79,7 +81,7 @@ body {
   max-height: calc(100vh - 3rem);
   background: #fff;
   border-radius: var(--auth-radius);
-  box-shadow: 0 30px 70px rgba(59, 47, 42, 0.18);
+  box-shadow: 0 30px 70px rgba(62, 37, 34, 0.2);
   overflow: hidden;
 }
 
@@ -185,11 +187,11 @@ body {
 .form-inner select {
   width: 100%;
   padding: 0.6rem 0.7rem;
-  border: 1px solid var(--auth-border);
+  border: 1px solid var(--auth-input-border);
   border-radius: var(--auth-radius-sm);
   font-size: 0.88rem;
   font-family: inherit;
-  background: #fff;
+  background: var(--auth-input-bg);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -197,7 +199,7 @@ body {
 .form-inner select:focus {
   outline: none;
   border-color: var(--auth-primary);
-  box-shadow: 0 0 0 3px rgba(140, 106, 74, 0.18);
+  box-shadow: 0 0 0 3px rgba(140, 110, 99, 0.18);
 }
 
 .auth-submit {
@@ -258,11 +260,11 @@ body {
 }
 
 .auth-message.error {
-  color: #C94C4C;
+  color: #D9534F;
 }
 
 .auth-message.success {
-  color: #2E8B57;
+  color: #4CAF50;
 }
 
 /* Overlay (sliding) panel */
@@ -274,7 +276,7 @@ body {
   width: 50%;
   height: 100%;
   z-index: 5;
-  background: linear-gradient(rgba(59, 47, 42, 0.74), rgba(59, 47, 42, 0.74)), url('/images/sirket.jpg') center center / cover no-repeat;
+  background: linear-gradient(rgba(62, 37, 34, 0.8), rgba(62, 37, 34, 0.8)), url('/images/sirket.jpg') center center / cover no-repeat;
   transition: transform 600ms cubic-bezier(0.65, 0, 0.35, 1);
 }
 

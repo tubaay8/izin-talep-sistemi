@@ -144,7 +144,7 @@ tbody.addEventListener('click', async (event) => {
       text: `"${type.name}" izin turunu silmek istediginize emin misiniz?`,
       icon: 'warning',
       confirmText: 'Evet, Sil',
-      confirmColor: '#C94C4C',
+      confirmColor: '#D9534F',
     });
     if (!confirmed) return;
 
