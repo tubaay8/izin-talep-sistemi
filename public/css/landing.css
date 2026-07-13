@@ -1,17 +1,18 @@
 :root {
-  --color-navy: #142033;
-  --color-navy-light: #1f3153;
-  --color-accent: #2f6fed;
-  --color-accent-dark: #2457c4;
-  --color-text: #24303f;
-  --color-muted: #64748b;
-  --color-bg: #f6f8fb;
-  --color-border: #e4e9f1;
-  --radius: 12px;
-  --shadow: 0 10px 30px rgba(20, 32, 51, 0.08);
-  --card-bg: rgba(255, 255, 255, 0.94);
-  --card-border: 1px solid rgba(255, 255, 255, 0.4);
-  --card-blur: blur(10px);
+  --color-navy: #3B2F2A;
+  --color-navy-light: #5A4A3F;
+  --color-accent: #8C6A4A;
+  --color-accent-dark: #A27854;
+  --color-accent-light: #E8D8C9;
+  --color-text: #5E534C;
+  --color-muted: #8E847D;
+  --color-bg: #F2ECE6;
+  --color-border: #E7DDD4;
+  --radius: 20px;
+  --shadow: 0 12px 32px rgba(59, 47, 42, 0.08);
+  --card-bg: #FFFFFF;
+  --card-border: 1px solid #E7DDD4;
+  --card-blur: none;
 }
 
 * {
@@ -25,9 +26,9 @@ html {
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
   color: var(--color-text);
-  background: linear-gradient(rgba(10, 25, 55, 0.78), rgba(10, 25, 55, 0.78)), url('/images/sirket.jpg') center center / cover fixed no-repeat;
+  background: linear-gradient(rgba(59, 47, 42, 0.74), rgba(59, 47, 42, 0.74)), url('/images/sirket.jpg') center center / cover fixed no-repeat;
   line-height: 1.5;
 }
 
@@ -167,7 +168,7 @@ a {
 
 .hero-subtitle {
   display: block;
-  color: #8fb4ff;
+  color: var(--color-accent-light);
   font-weight: 700;
   font-size: 1.15rem;
   margin: 0.5rem 0 1.2rem;
@@ -182,7 +183,7 @@ a {
 
 .hero-text p {
   font-size: 1.05rem;
-  color: #cbd5e1;
+  color: #F3E6D8;
   max-width: 48ch;
   margin: 0 0 2rem;
 }
@@ -223,7 +224,7 @@ a {
 }
 
 .btn-hero-secondary:hover {
-  background: #eef4ff;
+  background: var(--color-bg);
   border-color: var(--color-accent);
 }
 
@@ -241,7 +242,7 @@ a {
   backdrop-filter: var(--card-blur);
   -webkit-backdrop-filter: var(--card-blur);
   border-radius: var(--radius);
-  box-shadow: 0 24px 60px rgba(20, 32, 51, 0.28);
+  box-shadow: 0 24px 60px rgba(59, 47, 42, 0.22);
   overflow: hidden;
   border: var(--card-border);
 }
@@ -250,7 +251,7 @@ a {
   display: flex;
   gap: 6px;
   padding: 0.9rem 1rem;
-  background: #eef1f6;
+  background: var(--color-bg);
 }
 
 .mock-dot {
@@ -260,15 +261,15 @@ a {
 }
 
 .mock-dot.red {
-  background: #ef4444;
+  background: #C94C4C;
 }
 
 .mock-dot.yellow {
-  background: #f59e0b;
+  background: #D4A017;
 }
 
 .mock-dot.green {
-  background: #22c55e;
+  background: #2E8B57;
 }
 
 .mock-card-body {
@@ -326,7 +327,7 @@ a {
 }
 
 .section-subtitle {
-  color: #cbd5e1;
+  color: #F3E6D8;
   margin: 0;
   font-size: 1rem;
 }
@@ -407,7 +408,7 @@ a {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: #eaf0fe;
+  background: var(--color-accent-light);
   color: var(--color-accent);
   display: inline-flex;
   align-items: center;
@@ -476,7 +477,7 @@ a {
   flex-shrink: 0;
   min-width: 68px;
   text-align: center;
-  background: #eaf0fe;
+  background: var(--color-accent-light);
   color: var(--color-accent-dark);
   font-weight: 700;
   font-size: 0.8rem;
@@ -535,7 +536,7 @@ a {
   align-items: center;
   justify-content: center;
   margin-bottom: 0.75rem;
-  box-shadow: 0 12px 24px rgba(47, 111, 237, 0.28);
+  box-shadow: 0 12px 24px rgba(140, 106, 74, 0.28);
   transition: transform 0.2s ease;
 }
 

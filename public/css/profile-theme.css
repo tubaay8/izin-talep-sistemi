@@ -76,7 +76,7 @@ body.admin-layout .page-card {
   width: 30px;
   height: 30px;
   border-radius: 9px;
-  background: #eaf0fe;
+  background: #EAD5BE;
   color: var(--color-accent);
   flex-shrink: 0;
 }
@@ -161,23 +161,23 @@ body.admin-layout .page-card {
 }
 
 .profile-readonly-icon--role {
-  background: #eaf0fe;
+  background: #EAD5BE;
   color: var(--color-accent);
 }
 
 .profile-readonly-icon--department {
-  background: #fdf1de;
-  color: #f39c12;
+  background: #F5DFC4;
+  color: var(--badge-yellow);
 }
 
 .profile-readonly-icon--manager {
-  background: #e3f6ec;
-  color: #16a34a;
+  background: #E8F5E9;
+  color: var(--badge-green);
 }
 
 .profile-readonly-icon--status {
-  background: #eceeef;
-  color: #7f8c8d;
+  background: #EAE2DA;
+  color: var(--badge-neutral);
 }
 
 /* Kayit Tarihi / Son Guncelleme kartlari */
@@ -212,7 +212,7 @@ body.admin-layout .page-card {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #eaf0fe;
+  background: #EAD5BE;
   color: var(--color-accent);
   flex-shrink: 0;
 }
@@ -245,6 +245,7 @@ body.admin-layout .page-card {
 
 /* ==========================================================================
    Karanlik mod - sadece profile.html'e ozel bilesenler
+   Ayni sicak kahverengi/krem aksan (dark-theme.css --dt-primary) kullanilir.
    ========================================================================== */
 
 html[data-theme="dark"] .profile-breadcrumb,
@@ -265,7 +266,7 @@ html[data-theme="dark"] .profile-form-card {
 
 html[data-theme="dark"] .profile-avatar,
 html[data-theme="dark"] .profile-avatar-img {
-  box-shadow: 0 0 0 4px var(--dt-card), 0 0 0 8px rgba(59, 130, 246, 0.35), 0 0 26px rgba(59, 130, 246, 0.45);
+  box-shadow: 0 0 0 4px var(--dt-card), 0 0 0 8px rgba(211, 163, 118, 0.35), 0 0 26px rgba(211, 163, 118, 0.45);
 }
 
 html[data-theme="dark"] .profile-camera-badge {
@@ -278,11 +279,11 @@ html[data-theme="dark"] .profile-photo-hint {
 }
 
 html[data-theme="dark"] .profile-section-title {
-  color: #ffffff;
+  color: var(--dt-heading);
 }
 
 html[data-theme="dark"] .profile-section-icon {
-  background: rgba(59, 130, 246, 0.16);
+  background: rgba(211, 163, 118, 0.2);
   color: var(--dt-primary-light);
 }
 
@@ -295,7 +296,7 @@ html[data-theme="dark"] .profile-readonly-field {
 
 html[data-theme="dark"] .profile-readonly-field:hover {
   transform: translateY(-2px);
-  border-color: rgba(59, 130, 246, 0.4);
+  border-color: rgba(211, 163, 118, 0.4);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
 }
 
@@ -306,26 +307,26 @@ html[data-theme="dark"] .profile-meta-label {
 
 html[data-theme="dark"] .profile-readonly-value,
 html[data-theme="dark"] .profile-meta-value {
-  color: #ffffff;
+  color: var(--dt-heading);
 }
 
 html[data-theme="dark"] .profile-readonly-icon--role {
-  background: rgba(59, 130, 246, 0.16);
+  background: rgba(211, 163, 118, 0.2);
   color: var(--dt-primary-light);
 }
 
 html[data-theme="dark"] .profile-readonly-icon--department {
-  background: rgba(243, 156, 18, 0.16);
-  color: #f39c12;
+  background: rgba(211, 163, 118, 0.2);
+  color: var(--dt-primary-light);
 }
 
 html[data-theme="dark"] .profile-readonly-icon--manager {
-  background: rgba(22, 163, 74, 0.16);
-  color: #4ade80;
+  background: rgba(76, 175, 80, 0.18);
+  color: #8FCB92;
 }
 
 html[data-theme="dark"] .profile-readonly-icon--status {
-  background: rgba(148, 163, 184, 0.16);
+  background: rgba(169, 143, 123, 0.18);
   color: var(--dt-muted);
 }
 
@@ -338,11 +339,11 @@ html[data-theme="dark"] .profile-meta-card {
 
 html[data-theme="dark"] .profile-meta-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(59, 130, 246, 0.4);
+  border-color: rgba(211, 163, 118, 0.4);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
 }
 
 html[data-theme="dark"] .profile-meta-icon {
-  background: rgba(59, 130, 246, 0.16);
+  background: rgba(211, 163, 118, 0.2);
   color: var(--dt-primary-light);
 }

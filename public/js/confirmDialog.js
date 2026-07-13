@@ -1,7 +1,7 @@
 const DIALOG_COLORS = {
-  approve: '#27ae60',
-  reject: '#c0392b',
-  neutral: '#2c3e50',
+  approve: '#2E8B57',
+  reject: '#C94C4C',
+  neutral: '#3B2F2A',
 };
 
 function confirmDialog({ title, text, icon = 'question', confirmText, confirmColor = DIALOG_COLORS.neutral }) {
@@ -13,7 +13,7 @@ function confirmDialog({ title, text, icon = 'question', confirmText, confirmCol
     confirmButtonText: confirmText,
     cancelButtonText: 'Vazgec',
     confirmButtonColor: confirmColor,
-    cancelButtonColor: '#95a5a6',
+    cancelButtonColor: '#9C8F86',
     reverseButtons: true,
     focusCancel: true,
   }).then((result) => result.isConfirmed);
@@ -41,7 +41,7 @@ async function confirmRejectRequest() {
     confirmButtonText: 'Evet, Reddet',
     cancelButtonText: 'Vazgec',
     confirmButtonColor: DIALOG_COLORS.reject,
-    cancelButtonColor: '#95a5a6',
+    cancelButtonColor: '#9C8F86',
     reverseButtons: true,
     focusCancel: true,
   });
