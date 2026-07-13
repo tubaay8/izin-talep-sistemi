@@ -40,9 +40,9 @@ html[data-theme="dark"] {
   --dt-bg-1: #1E1512;
   --dt-bg-2: #251A15;
 
-  /* Yuzeyler */
-  --surface: #2E2119;
-  --surface-2: #3A2B22;
+  /* Yuzeyler (kartlar ve sidebar, arka plandan bilerek biraz acik) */
+  --surface: #362A21;
+  --surface-2: #443426;
 
   /* Tablo */
   --table-bg: #2B1E19;
@@ -74,7 +74,7 @@ html[data-theme="dark"] {
 }
 
 html[data-theme="dark"] body {
-  background: radial-gradient(circle at 15% 0%, var(--surface-2), var(--dt-bg-1) 55%);
+  background: radial-gradient(circle at 15% 0%, var(--dt-bg-2), var(--dt-bg-1) 55%);
   color: var(--text-primary);
   font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
 }
@@ -90,7 +90,7 @@ html[data-theme="dark"] a {
 /* Sidebar */
 
 html[data-theme="dark"] body.admin-layout .admin-sidebar {
-  background: linear-gradient(180deg, var(--dt-bg-2), var(--dt-bg-1));
+  background: linear-gradient(180deg, var(--surface), var(--dt-bg-2));
   border-right: 1px solid var(--border);
   box-shadow: 6px 0 28px rgba(0, 0, 0, 0.45);
 }
