@@ -22,6 +22,10 @@ router.get('/dashboard', requireAuth, (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'dashboard.html'));
 });
 
+router.get('/profile', requireAuth, (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'profile.html'));
+});
+
 router.get('/leave-requests', requireAuth, (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'leave-requests.html'));
 });

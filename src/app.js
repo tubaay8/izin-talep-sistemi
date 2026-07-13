@@ -16,6 +16,7 @@ const adminLeaveRequestRoutes = require('./routes/adminLeaveRequest.routes');
 const adminDepartmentRoutes = require('./routes/adminDepartment.routes');
 const adminLeaveTypeRoutes = require('./routes/adminLeaveType.routes');
 const statsRoutes = require('./routes/stats.routes');
+const profileRoutes = require('./routes/profile.routes');
 const { requireAuth, requireRole } = require('./middlewares/auth.middleware');
 
 const app = express();
@@ -53,6 +54,7 @@ app.use('/api/admin/leave-requests', requireAuth, requireRole('Admin'), adminLea
 app.use('/api/admin/departments', requireAuth, requireRole('Admin'), adminDepartmentRoutes);
 app.use('/api/admin/leave-types', requireAuth, requireRole('Admin'), adminLeaveTypeRoutes);
 app.use('/api/stats', requireAuth, statsRoutes);
+app.use('/api/profile', requireAuth, profileRoutes);
 app.use('/', indexRoutes);
 
 const PORT = process.env.PORT || 3000;

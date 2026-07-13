@@ -3,3 +3,6 @@ node_modules/
 *.log
 public/uploads/reports/*
 !public/uploads/reports/.gitkeep
+public/avatars/*
+!public/avatars/.gitkeep
+.claude/

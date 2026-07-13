@@ -1,4 +1,5 @@
 const departmentRepository = require('../repositories/department.repository');
+const userRepository = require('../repositories/user.repository');
 
 async function getAllDepartments() {
   return departmentRepository.findAll();
@@ -14,29 +15,51 @@ async function getDepartmentById(id) {
   return department;
 }
 
-async function createDepartment(name) {
+async function assertValidDepartmentManager(managerId, excludeDepartmentId = null) {
+  if (!managerId) return null;
+  const availableManagers = await userRepository.findAvailableManagers(excludeDepartmentId);
+  const isValid = availableManagers.some((manager) => manager.id === Number(managerId));
+  if (!isValid) {
+    const error = new Error('Gecersiz yonetici veya bu yonetici baska bir departmana atanmis');
+    error.status = 400;
+    throw error;
+  }
+  return managerId;
+}
+
+function translateDuplicateError(err) {
+  const message = err.sqlMessage || err.message || '';
+  if (message.includes('uq_departments_manager')) {
+    const error = new Error('Bu yonetici zaten baska bir departmana atanmis');
+    error.status = 409;
+    return error;
+  }
+  const error = new Error('Bu departman adi zaten kullaniliyor');
+  error.status = 409;
+  return error;
+}
+
+async function createDepartment(name, managerId) {
+  const validManagerId = await assertValidDepartmentManager(managerId);
   try {
-    const id = await departmentRepository.create(name);
+    const id = await departmentRepository.create(name, validManagerId);
     return departmentRepository.findById(id);
   } catch (err) {
     if (err.code === 'ER_DUP_ENTRY') {
-      const error = new Error('Bu departman adi zaten kullaniliyor');
-      error.status = 409;
-      throw error;
+      throw translateDuplicateError(err);
     }
     throw err;
   }
 }
 
-async function updateDepartment(id, name) {
+async function updateDepartment(id, name, managerId) {
   await getDepartmentById(id);
+  const validManagerId = await assertValidDepartmentManager(managerId, id);
   try {
-    await departmentRepository.update(id, name);
+    await departmentRepository.update(id, name, validManagerId);
   } catch (err) {
     if (err.code === 'ER_DUP_ENTRY') {
-      const error = new Error('Bu departman adi zaten kullaniliyor');
-      error.status = 409;
-      throw error;
+      throw translateDuplicateError(err);
     }
     throw err;
   }

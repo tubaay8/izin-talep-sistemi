@@ -1,0 +1,348 @@
+/* ==========================================================================
+   Profilim sayfasina ozel bilesenler (sadece bu sayfada kullanilir).
+   Ortak koyu mod kurallari (sidebar, header, page-card, form-card...)
+   icin bkz. /css/dark-theme.css - tum sayfalarda ortak yuklenir.
+   ========================================================================== */
+
+/* Sayfa cok genis ekranlarda asiri yayilip bosluk birakmasin */
+body.admin-layout .page-card {
+  max-width: 1040px;
+}
+
+.profile-layout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.9rem;
+}
+
+.profile-photo-card {
+  flex: 0 1 270px;
+  justify-content: center;
+}
+
+.profile-form-card {
+  flex: 1 1 360px;
+  max-width: 420px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem;
+}
+
+.profile-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  margin-bottom: 1rem;
+}
+
+.profile-breadcrumb a {
+  color: var(--color-muted);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.profile-breadcrumb a:hover {
+  color: var(--color-accent);
+}
+
+.profile-breadcrumb-sep {
+  opacity: 0.6;
+}
+
+.profile-avatar-wrap {
+  overflow: visible;
+}
+
+.profile-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.profile-section-title--readonly {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.profile-section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: #eaf0fe;
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.profile-section-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.profile-account-section {
+  margin-top: 1.5rem;
+}
+
+.profile-account-section .profile-readonly-grid {
+  margin-top: 1rem;
+}
+
+.profile-camera-badge {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  color: #fff;
+  border: 2px solid #fff;
+  cursor: pointer;
+  z-index: 2;
+  transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.profile-camera-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.profile-camera-badge:hover {
+  background: var(--color-accent-dark);
+  transform: scale(1.08);
+}
+
+/* Hesap bilgisi kartlari - kompakt, tek satirda 4 kart */
+
+.profile-readonly-field {
+  position: relative;
+  padding: 0.65rem 0.8rem;
+}
+
+.profile-readonly-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 640px) {
+  .profile-readonly-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 380px) {
+  .profile-readonly-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profile-readonly-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  margin-bottom: 0.3rem;
+}
+
+.profile-readonly-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.profile-readonly-icon--role {
+  background: #eaf0fe;
+  color: var(--color-accent);
+}
+
+.profile-readonly-icon--department {
+  background: #fdf1de;
+  color: #f39c12;
+}
+
+.profile-readonly-icon--manager {
+  background: #e3f6ec;
+  color: #16a34a;
+}
+
+.profile-readonly-icon--status {
+  background: #eceeef;
+  color: #7f8c8d;
+}
+
+/* Kayit Tarihi / Son Guncelleme kartlari */
+
+.profile-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 380px) {
+  .profile-meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profile-meta-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.9rem;
+}
+
+.profile-meta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #eaf0fe;
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.profile-meta-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.profile-meta-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.profile-meta-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.profile-meta-value {
+  font-size: 0.92rem;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Karanlik mod - sadece profile.html'e ozel bilesenler
+   ========================================================================== */
+
+html[data-theme="dark"] .profile-breadcrumb,
+html[data-theme="dark"] .profile-breadcrumb a {
+  color: var(--dt-muted);
+}
+
+html[data-theme="dark"] .profile-breadcrumb a:hover {
+  color: var(--dt-primary-light);
+}
+
+html[data-theme="dark"] .profile-photo-card,
+html[data-theme="dark"] .profile-form-card {
+  background: var(--dt-card);
+  border-color: var(--dt-border);
+  border-radius: 18px;
+}
+
+html[data-theme="dark"] .profile-avatar,
+html[data-theme="dark"] .profile-avatar-img {
+  box-shadow: 0 0 0 4px var(--dt-card), 0 0 0 8px rgba(59, 130, 246, 0.35), 0 0 26px rgba(59, 130, 246, 0.45);
+}
+
+html[data-theme="dark"] .profile-camera-badge {
+  border-color: var(--dt-card);
+  background: linear-gradient(135deg, var(--dt-primary), var(--dt-primary-light));
+}
+
+html[data-theme="dark"] .profile-photo-hint {
+  color: var(--dt-muted);
+}
+
+html[data-theme="dark"] .profile-section-title {
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .profile-section-icon {
+  background: rgba(59, 130, 246, 0.16);
+  color: var(--dt-primary-light);
+}
+
+html[data-theme="dark"] .profile-readonly-field {
+  background: var(--dt-card);
+  border-color: var(--dt-border);
+  border-radius: 16px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+html[data-theme="dark"] .profile-readonly-field:hover {
+  transform: translateY(-2px);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="dark"] .profile-readonly-label,
+html[data-theme="dark"] .profile-meta-label {
+  color: var(--dt-muted);
+}
+
+html[data-theme="dark"] .profile-readonly-value,
+html[data-theme="dark"] .profile-meta-value {
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .profile-readonly-icon--role {
+  background: rgba(59, 130, 246, 0.16);
+  color: var(--dt-primary-light);
+}
+
+html[data-theme="dark"] .profile-readonly-icon--department {
+  background: rgba(243, 156, 18, 0.16);
+  color: #f39c12;
+}
+
+html[data-theme="dark"] .profile-readonly-icon--manager {
+  background: rgba(22, 163, 74, 0.16);
+  color: #4ade80;
+}
+
+html[data-theme="dark"] .profile-readonly-icon--status {
+  background: rgba(148, 163, 184, 0.16);
+  color: var(--dt-muted);
+}
+
+html[data-theme="dark"] .profile-meta-card {
+  background: var(--dt-card);
+  border-color: var(--dt-border);
+  border-radius: 16px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+html[data-theme="dark"] .profile-meta-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="dark"] .profile-meta-icon {
+  background: rgba(59, 130, 246, 0.16);
+  color: var(--dt-primary-light);
+}

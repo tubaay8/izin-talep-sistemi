@@ -45,8 +45,24 @@ async function findManagers() {
   return rows;
 }
 
+async function findAvailableManagers(excludeDepartmentId = null) {
+  const [rows] = await pool.query(
+    `SELECT u.id, u.full_name
+     FROM users u
+     JOIN roles r ON r.id = u.role_id
+     WHERE r.name = 'Yonetici' AND u.is_active = 1
+       AND (
+         u.id NOT IN (SELECT manager_id FROM departments WHERE manager_id IS NOT NULL)
+         OR u.id = (SELECT manager_id FROM departments WHERE id = ?)
+       )
+     ORDER BY u.full_name`,
+    [excludeDepartmentId]
+  );
+  return rows;
+}
+
 const ADMIN_SELECT_FIELDS = `
-  u.id, u.full_name, u.email, u.role_id, r.name AS role_name,
+  u.id, u.full_name, u.email, u.profile_photo, u.role_id, r.name AS role_name,
   u.department_id, d.name AS department_name,
   u.manager_id, m.full_name AS manager_name,
   u.is_active, u.created_at, u.updated_at
@@ -120,6 +136,19 @@ async function updatePassword(id, passwordHash) {
   await pool.query('UPDATE users SET password = ? WHERE id = ?', [passwordHash, id]);
 }
 
+async function updateOwnProfile(id, { full_name, email, profile_photo }) {
+  if (profile_photo !== undefined) {
+    await pool.query('UPDATE users SET full_name = ?, email = ?, profile_photo = ? WHERE id = ?', [
+      full_name,
+      email,
+      profile_photo,
+      id,
+    ]);
+  } else {
+    await pool.query('UPDATE users SET full_name = ?, email = ? WHERE id = ?', [full_name, email, id]);
+  }
+}
+
 async function countByManagerId(managerId) {
   const [rows] = await pool.query('SELECT COUNT(*) AS total FROM users WHERE manager_id = ?', [managerId]);
   return rows[0].total;
@@ -154,10 +183,12 @@ module.exports = {
   findById,
   create,
   findManagers,
+  findAvailableManagers,
   findAll,
   findByIdDetailed,
   update,
   updatePassword,
+  updateOwnProfile,
   countByManagerId,
   countByActiveStatus,
   countTotal,

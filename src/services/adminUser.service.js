@@ -4,6 +4,8 @@ const departmentRepository = require('../repositories/department.repository');
 const { hashPassword } = require('../utils/password');
 const activityLogService = require('./activityLog.service');
 
+const HR_DEPARTMENT_NAME = 'Insan Kaynaklari';
+
 async function assertRoleExists(role_id) {
   const role = await roleRepository.findById(role_id);
   if (!role) {
@@ -21,6 +23,7 @@ async function assertDepartmentExists(department_id) {
     error.status = 400;
     throw error;
   }
+  return department;
 }
 
 async function assertValidManager(manager_id) {
@@ -33,6 +36,30 @@ async function assertValidManager(manager_id) {
     throw error;
   }
   return manager_id;
+}
+
+// Is kurali: her yonetici organizasyonel olarak Insan Kaynaklari departmaninda,
+// her personelin yoneticisi ise kendi departmaninin resmi yoneticisiyle ayni olmali.
+async function resolveDepartmentAndManager(role, submittedDepartmentId, submittedManagerId) {
+  if (role.name === 'Yonetici') {
+    const hrDepartment = await departmentRepository.findByName(HR_DEPARTMENT_NAME);
+    if (!hrDepartment) {
+      const error = new Error(`${HR_DEPARTMENT_NAME} departmani bulunamadi, once bu departmani olusturun`);
+      error.status = 400;
+      throw error;
+    }
+    const validManagerId = await assertValidManager(submittedManagerId);
+    return { department_id: hrDepartment.id, manager_id: validManagerId };
+  }
+
+  const department = await assertDepartmentExists(submittedDepartmentId);
+
+  if (role.name === 'Personel') {
+    return { department_id: department.id, manager_id: department.manager_id || null };
+  }
+
+  const validManagerId = await assertValidManager(submittedManagerId);
+  return { department_id: department.id, manager_id: validManagerId };
 }
 
 async function getAllUsers(filters) {
@@ -57,9 +84,8 @@ async function createUser({ full_name, email, password, role_id, department_id, 
     throw error;
   }
 
-  await assertRoleExists(role_id);
-  await assertDepartmentExists(department_id);
-  const validManagerId = await assertValidManager(manager_id);
+  const role = await assertRoleExists(role_id);
+  const resolved = await resolveDepartmentAndManager(role, department_id, manager_id);
 
   const passwordHash = await hashPassword(password);
   const userId = await userRepository.create({
@@ -67,8 +93,8 @@ async function createUser({ full_name, email, password, role_id, department_id, 
     email,
     passwordHash,
     role_id,
-    department_id,
-    manager_id: validManagerId,
+    department_id: resolved.department_id,
+    manager_id: resolved.manager_id,
   });
 
   const created = await userRepository.findByIdDetailed(userId);
@@ -94,8 +120,7 @@ async function updateUser(id, adminId, { full_name, email, role_id, department_i
   }
 
   const role = await assertRoleExists(role_id);
-  await assertDepartmentExists(department_id);
-  const validManagerId = await assertValidManager(manager_id);
+  const resolved = await resolveDepartmentAndManager(role, department_id, manager_id);
 
   if (Number(id) === Number(adminId) && (role.name !== 'Admin' || !is_active)) {
     const error = new Error('Kendi hesabinizin rolunu veya aktiflik durumunu bu ekrandan degistiremezsiniz');
@@ -107,8 +132,8 @@ async function updateUser(id, adminId, { full_name, email, role_id, department_i
     full_name,
     email,
     role_id,
-    department_id,
-    manager_id: validManagerId,
+    department_id: resolved.department_id,
+    manager_id: resolved.manager_id,
     is_active: is_active ? 1 : 0,
   });
 

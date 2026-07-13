@@ -7,7 +7,7 @@ async function list(req, res) {
 
 async function create(req, res) {
   try {
-    const department = await departmentService.createDepartment(req.body.name);
+    const department = await departmentService.createDepartment(req.body.name, req.body.manager_id);
     res.status(201).json({ message: 'Departman olusturuldu', department });
   } catch (err) {
     res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
@@ -16,7 +16,7 @@ async function create(req, res) {
 
 async function update(req, res) {
   try {
-    const department = await departmentService.updateDepartment(req.params.id, req.body.name);
+    const department = await departmentService.updateDepartment(req.params.id, req.body.name, req.body.manager_id);
     res.json({ message: 'Departman guncellendi', department });
   } catch (err) {
     res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });

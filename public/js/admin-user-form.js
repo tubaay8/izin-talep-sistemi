@@ -3,11 +3,55 @@ const messageEl = document.getElementById('form-message');
 const roleSelect = document.getElementById('role_id');
 const departmentSelect = document.getElementById('department_id');
 const managerSelect = document.getElementById('manager_id');
+const departmentHint = document.getElementById('department-hint');
+const managerHint = document.getElementById('manager-hint');
 const passwordInput = document.getElementById('password');
 const passwordLabel = document.getElementById('password-label');
 const activeField = document.getElementById('active-field');
 const formTitle = document.getElementById('form-title');
 const submitBtn = document.getElementById('submit-btn');
+
+const HR_DEPARTMENT_NAME = 'Insan Kaynaklari';
+let departmentsData = [];
+let hrDepartmentId = null;
+
+function getSelectedRoleName() {
+  const opt = roleSelect.options[roleSelect.selectedIndex];
+  return opt ? opt.textContent : '';
+}
+
+function applyDepartmentManagerHint() {
+  const dept = departmentsData.find((d) => String(d.id) === String(departmentSelect.value));
+  if (dept && dept.manager_id) {
+    managerSelect.value = dept.manager_id;
+    managerHint.textContent = `Bu departmanin yoneticisi: ${dept.manager_name}`;
+  } else {
+    managerSelect.value = '';
+    managerHint.textContent = dept ? 'Bu departmanin henuz yoneticisi yok, once departmana bir yonetici atayin.' : '';
+  }
+}
+
+function applyRoleConstraints() {
+  const roleName = getSelectedRoleName();
+
+  if (roleName === 'Yonetici') {
+    if (hrDepartmentId) departmentSelect.value = hrDepartmentId;
+    departmentSelect.disabled = true;
+    departmentHint.textContent = 'Yoneticiler organizasyonel olarak Insan Kaynaklari departmaninda gorunur.';
+    managerSelect.disabled = false;
+    managerHint.textContent = '';
+  } else if (roleName === 'Personel') {
+    departmentSelect.disabled = false;
+    departmentHint.textContent = '';
+    managerSelect.disabled = true;
+    applyDepartmentManagerHint();
+  } else {
+    departmentSelect.disabled = false;
+    departmentHint.textContent = '';
+    managerSelect.disabled = false;
+    managerHint.textContent = '';
+  }
+}
 
 const userId = new URLSearchParams(window.location.search).get('id');
 const isEditMode = window.location.pathname === '/admin/users/edit' && userId;
@@ -34,6 +78,20 @@ async function loadOptions(url, select, labelKey) {
   });
 }
 
+async function loadDepartments() {
+  const res = await fetch('/api/departments');
+  const data = await res.json();
+  departmentsData = data.departments;
+  departmentsData.forEach((dept) => {
+    const option = document.createElement('option');
+    option.value = dept.id;
+    option.textContent = dept.name;
+    departmentSelect.appendChild(option);
+  });
+  const hrDepartment = departmentsData.find((d) => d.name === HR_DEPARTMENT_NAME);
+  hrDepartmentId = hrDepartment ? hrDepartment.id : null;
+}
+
 async function loadExistingUser() {
   const res = await fetch(`/api/admin/users/${userId}`);
   const data = await res.json();
@@ -51,7 +109,13 @@ async function loadExistingUser() {
   departmentSelect.value = data.user.department_id;
   managerSelect.value = data.user.manager_id || '';
   document.getElementById('is_active').value = data.user.is_active ? 'true' : 'false';
+  applyRoleConstraints();
 }
+
+roleSelect.addEventListener('change', applyRoleConstraints);
+departmentSelect.addEventListener('change', () => {
+  if (getSelectedRoleName() === 'Personel') applyDepartmentManagerHint();
+});
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -101,10 +165,12 @@ form.addEventListener('submit', async (event) => {
 
 Promise.all([
   loadOptions('/api/roles', roleSelect, 'name'),
-  loadOptions('/api/departments', departmentSelect, 'name'),
+  loadDepartments(),
   loadOptions('/api/managers', managerSelect, 'full_name'),
 ]).then(() => {
   if (isEditMode) {
     loadExistingUser();
+  } else {
+    applyRoleConstraints();
   }
 });

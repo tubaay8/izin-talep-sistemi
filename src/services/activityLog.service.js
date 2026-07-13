@@ -13,6 +13,7 @@ const ACTION_TYPES = {
   USER_DEACTIVATED: 'user.deactivated',
   USER_ROLE_CHANGED: 'user.role_changed',
   USER_DEPARTMENT_CHANGED: 'user.department_changed',
+  PROFILE_UPDATED: 'user.profile_updated',
 };
 
 const DEFAULT_LIMIT = 10;

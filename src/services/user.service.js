@@ -4,4 +4,8 @@ async function getManagers() {
   return userRepository.findManagers();
 }
 
-module.exports = { getManagers };
+async function getAvailableManagers(excludeDepartmentId) {
+  return userRepository.findAvailableManagers(excludeDepartmentId || null);
+}
+
+module.exports = { getManagers, getAvailableManagers };

@@ -96,13 +96,17 @@ function populateSidebarProfile(user) {
   const sidebarEmail = document.getElementById('sidebar-profile-email');
   if (!sidebarAvatar || !sidebarName || !sidebarEmail) return;
 
-  const initials = user.full_name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0].toUpperCase())
-    .join('');
-  sidebarAvatar.textContent = initials;
+  if (user.profile_photo) {
+    sidebarAvatar.innerHTML = `<img src="/avatars/${user.profile_photo}" alt="" />`;
+  } else {
+    const initials = user.full_name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0].toUpperCase())
+      .join('');
+    sidebarAvatar.textContent = initials;
+  }
   sidebarName.textContent = user.full_name;
   sidebarEmail.textContent = user.email;
 }

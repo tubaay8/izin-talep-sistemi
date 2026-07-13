@@ -5,4 +5,9 @@ async function listManagers(req, res) {
   res.json({ managers });
 }
 
-module.exports = { listManagers };
+async function listAvailableManagers(req, res) {
+  const managers = await userService.getAvailableManagers(req.query.exclude_department_id);
+  res.json({ managers });
+}
+
+module.exports = { listManagers, listAvailableManagers };

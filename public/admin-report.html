@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Raporlar - Izin Talep Sistemi</title>
-  <link rel="stylesheet" href="/css/style.css?v=7" />
+  <link rel="stylesheet" href="/css/style.css?v=9" />
+  <link rel="stylesheet" href="/css/dark-theme.css?v=1" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#0f172a" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
@@ -52,6 +53,10 @@
   <header class="dashboard-header">
     <h1><span class="brand-logo">İT</span> İzin Talep Sistemi</h1>
     <div class="dashboard-header-user">
+      <button type="button" class="header-icon-btn" id="theme-toggle-btn" title="Karanlık modu aç/kapat" aria-label="Karanlık modu aç/kapat">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
       <span>Hosgeldin, <strong id="user-name">...</strong></span>
       <span id="role-badge" class="role-badge"></span>
       <button id="logout-btn" class="logout-btn">
@@ -149,11 +154,13 @@
       </table>
     </div>
   </main>
+  <script src="/js/themeToggle.js"></script>
   <script src="/vendor/jspdf.umd.min.js"></script>
   <script src="/vendor/jspdf.plugin.autotable.min.js"></script>
   <script src="/js/reportExport.js"></script>
   <script src="/js/admin-report.js?v=2"></script>
   <script src="/js/adminSidebar.js"></script>
+  <script src="/js/sidebarProfileLink.js"></script>
   <script src="/js/sw-register.js"></script>
 </body>
 </html>

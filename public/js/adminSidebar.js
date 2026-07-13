@@ -10,13 +10,17 @@
     if (res.ok) {
       const { user } = await res.json();
       if (avatarEl && nameEl && emailEl) {
-        const initials = user.full_name
-          .split(' ')
-          .filter(Boolean)
-          .slice(0, 2)
-          .map((part) => part[0].toUpperCase())
-          .join('');
-        avatarEl.textContent = initials;
+        if (user.profile_photo) {
+          avatarEl.innerHTML = `<img src="/avatars/${user.profile_photo}" alt="" />`;
+        } else {
+          const initials = user.full_name
+            .split(' ')
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((part) => part[0].toUpperCase())
+            .join('');
+          avatarEl.textContent = initials;
+        }
         nameEl.textContent = user.full_name;
         emailEl.textContent = user.email;
       }

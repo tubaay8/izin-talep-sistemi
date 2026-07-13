@@ -10,6 +10,7 @@ function toPublicUser(user) {
     id: user.id,
     full_name: user.full_name,
     email: user.email,
+    profile_photo: user.profile_photo || null,
     role_id: user.role_id,
     role_name: user.role_name,
     department_id: user.department_id,
