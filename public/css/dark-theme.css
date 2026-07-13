@@ -1,11 +1,12 @@
 /* ==========================================================================
    Global Karanlik Mod - tum admin-layout sayfalarinda ortak kullanilir.
-   Acik mod (style.css) degismez; kurallarin tamami [data-theme="dark"]
-   altinda calisir. Tema sec/kalici tutma: /js/themeToggle.js
+   Acik mod (style.css) tamamen ayri degiskenler kullanir ve bu dosyadan
+   etkilenmez; kurallarin tamami [data-theme="dark"] altinda calisir.
+   Tema sec/kalici tutma: /js/themeToggle.js
 
-   Ortak kontrast degiskenleri (WCAG icin): --text-primary, --text-secondary,
-   --text-muted, --heading, --surface, --surface-hover, --border-color.
-   Marka rengi ayni kalir (sicak kahverengi/krem); sadece kontrast artirildi.
+   Tema degiskenleri: --surface, --surface-2, --table-bg, --table-bg-alt,
+   --table-header, --table-hover, --text-primary, --text-secondary,
+   --text-muted, --heading, --border.
    ========================================================================== */
 
 .header-icon-btn {
@@ -38,33 +39,42 @@ html[data-theme="dark"] {
   /* Sayfa katmanlari */
   --dt-bg-1: #1E1512;
   --dt-bg-2: #251A15;
-  --dt-bg-3: #2D211B;
 
-  /* Ortak kontrast degiskenleri */
-  --text-primary: #F8F5F1;
-  --text-secondary: #D8C7B7;
-  --text-muted: #C2AC98;
-  --heading: #FFFFFF;
+  /* Yuzeyler */
   --surface: #2E2119;
-  --surface-hover: #3D2C22;
-  --border-color: rgba(216, 199, 183, 0.22);
+  --surface-2: #3A2B22;
 
-  /* Marka aksani (ayni sicak kahverengi/krem palet) */
+  /* Tablo */
+  --table-bg: #2B1E19;
+  --table-bg-alt: #31231D;
+  --table-header: #3E2522;
+  --table-hover: #4B342D;
+
+  /* Metin */
+  --heading: #FFFFFF;
+  --text-primary: #F6EFE8;
+  --text-secondary: #D9C6B5;
+  --text-muted: #B89E8D;
+
+  /* Kenarlik */
+  --border: rgba(255, 255, 255, 0.08);
+
+  /* Marka aksani (sicak kahverengi/krem palet) */
   --dt-primary: #D3A376;
   --dt-primary-light: #E8C39A;
   --dt-active-bg-start: #8C6E63;
   --dt-active-bg-end: #5C4030;
 
-  /* Eski degisken adlarinin yeni degiskenlere baglanmasi (geriye donuk uyum) */
+  /* Eski degisken adlarinin yenilerine baglanmasi (geriye donuk uyum icin) */
   --dt-card: var(--surface);
-  --dt-border: var(--border-color);
+  --dt-border: var(--border);
   --dt-heading: var(--heading);
   --dt-text: var(--text-primary);
   --dt-muted: var(--text-secondary);
 }
 
 html[data-theme="dark"] body {
-  background: radial-gradient(circle at 15% 0%, var(--dt-bg-3), var(--dt-bg-1) 55%);
+  background: radial-gradient(circle at 15% 0%, var(--surface-2), var(--dt-bg-1) 55%);
   color: var(--text-primary);
   font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
 }
@@ -81,12 +91,12 @@ html[data-theme="dark"] a {
 
 html[data-theme="dark"] body.admin-layout .admin-sidebar {
   background: linear-gradient(180deg, var(--dt-bg-2), var(--dt-bg-1));
-  border-right: 1px solid var(--border-color);
+  border-right: 1px solid var(--border);
   box-shadow: 6px 0 28px rgba(0, 0, 0, 0.45);
 }
 
 html[data-theme="dark"] .sidebar-profile {
-  border-bottom-color: var(--border-color);
+  border-bottom-color: var(--border);
 }
 
 html[data-theme="dark"] .sidebar-avatar {
@@ -109,8 +119,8 @@ html[data-theme="dark"] .sidebar-logout {
 
 html[data-theme="dark"] .sidebar-link:hover,
 html[data-theme="dark"] .sidebar-profile-link:hover {
-  background: var(--surface-hover);
-  color: #FFF2DF;
+  background: var(--surface-2);
+  color: var(--heading);
 }
 
 html[data-theme="dark"] .sidebar-link.active,
@@ -129,8 +139,8 @@ html[data-theme="dark"] .sidebar-logout:hover {
 /* Header */
 
 html[data-theme="dark"] .dashboard-header {
-  background: rgba(41, 29, 24, 0.85);
-  border-color: var(--border-color);
+  background: var(--surface);
+  border-color: var(--border);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
@@ -153,8 +163,8 @@ html[data-theme="dark"] .role-badge {
 }
 
 html[data-theme="dark"] .header-icon-btn {
-  background: var(--dt-bg-3);
-  border-color: var(--border-color);
+  background: var(--surface-2);
+  border-color: var(--border);
   color: var(--text-secondary);
 }
 
@@ -166,7 +176,7 @@ html[data-theme="dark"] .header-icon-btn:hover {
 }
 
 html[data-theme="dark"] .logout-btn {
-  background: var(--dt-bg-3);
+  background: var(--surface-2);
   color: #F0A8A4;
   border-color: rgba(240, 168, 164, 0.4);
 }
@@ -178,14 +188,14 @@ html[data-theme="dark"] .logout-btn:hover {
 /* Genel kartlar */
 
 html[data-theme="dark"] .page-card {
-  background: rgba(41, 29, 24, 0.88);
-  border-color: var(--border-color);
+  background: var(--surface);
+  border-color: var(--border);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
   border-radius: 20px;
 }
 
 html[data-theme="dark"] .page-header {
-  border-bottom-color: var(--border-color);
+  border-bottom-color: var(--border);
 }
 
 html[data-theme="dark"] .page-header > div a {
@@ -199,8 +209,8 @@ html[data-theme="dark"] .page-header > div a:hover {
 /* Form kartlari */
 
 html[data-theme="dark"] .form-card {
-  background: rgba(41, 29, 24, 0.88);
-  border-color: var(--border-color);
+  background: var(--surface);
+  border-color: var(--border);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
   border-radius: 20px;
 }
@@ -215,14 +225,14 @@ html[data-theme="dark"] .form-card label {
 
 html[data-theme="dark"] .form-card input,
 html[data-theme="dark"] .form-card select {
-  background: var(--dt-bg-3);
-  border-color: var(--border-color);
+  background: var(--surface-2);
+  border-color: var(--border);
   color: var(--heading);
   border-radius: 12px;
 }
 
 html[data-theme="dark"] .form-card input::placeholder {
-  color: var(--text-secondary);
+  color: var(--text-muted);
   opacity: 1;
 }
 
@@ -262,7 +272,7 @@ html[data-theme="dark"] .report-meta {
 
 html[data-theme="dark"] .filter-bar {
   background: var(--surface);
-  border-color: var(--border-color);
+  border-color: var(--border);
 }
 
 html[data-theme="dark"] .filter-field label {
@@ -271,13 +281,13 @@ html[data-theme="dark"] .filter-field label {
 
 html[data-theme="dark"] .filter-field input,
 html[data-theme="dark"] .filter-field select {
-  background: var(--dt-bg-3);
-  border-color: var(--border-color);
+  background: var(--surface-2);
+  border-color: var(--border);
   color: var(--heading);
 }
 
 html[data-theme="dark"] .filter-field input::placeholder {
-  color: var(--text-secondary);
+  color: var(--text-muted);
   opacity: 1;
 }
 
@@ -288,8 +298,8 @@ html[data-theme="dark"] .filter-field select:focus {
 }
 
 html[data-theme="dark"] .filter-clear {
-  background: var(--dt-bg-3);
-  border-color: var(--border-color);
+  background: var(--surface-2);
+  border-color: var(--border);
   color: var(--text-secondary);
 }
 
@@ -298,47 +308,52 @@ html[data-theme="dark"] .filter-clear:hover {
   color: var(--heading);
 }
 
-/* Tablolar */
+/* Tablolar - tum data-table/table-scroll bilesenleri bu degiskenleri kullanir */
 
 html[data-theme="dark"] .table-scroll {
-  border-color: var(--border-color);
+  background: var(--table-bg);
+  border-color: var(--border);
 }
 
 html[data-theme="dark"] .data-table th {
-  background: var(--surface);
+  background: var(--table-header);
   color: var(--heading);
   font-weight: 800;
-  border-bottom-color: var(--border-color);
+  border-bottom-color: var(--border);
 }
 
 html[data-theme="dark"] .data-table td {
-  border-bottom-color: var(--border-color);
+  background: var(--table-bg);
+  border-bottom-color: var(--border);
   color: var(--text-primary);
-  background: transparent;
+}
+
+html[data-theme="dark"] .data-table tbody tr:nth-child(even) td {
+  background: var(--table-bg-alt);
 }
 
 html[data-theme="dark"] .data-table tbody tr:hover td {
-  background: var(--dt-active-bg-start);
+  background: var(--table-hover);
   color: #FFFFFF;
 }
 
 html[data-theme="dark"] .status-select {
-  background: var(--dt-bg-3);
-  border-color: var(--border-color);
+  background: var(--surface-2);
+  border-color: var(--border);
   color: var(--heading);
 }
 
 /* Dashboard bilesenleri */
 
 html[data-theme="dark"] .role-banner {
-  background: rgba(41, 29, 24, 0.88);
-  border-color: var(--border-color);
+  background: var(--surface);
+  border-color: var(--border);
   color: var(--text-secondary);
 }
 
 html[data-theme="dark"] .stat-card {
   background: var(--surface);
-  border-color: var(--border-color);
+  border-color: var(--border);
   border-radius: 18px;
 }
 
@@ -373,7 +388,7 @@ html[data-theme="dark"] .activity-icon-wrap.tone-rejected {
 
 html[data-theme="dark"] .tone-cancelled .stat-icon,
 html[data-theme="dark"] .activity-icon-wrap.tone-cancelled {
-  background: rgba(194, 172, 152, 0.28);
+  background: rgba(184, 158, 141, 0.28);
   color: var(--text-secondary);
 }
 
@@ -391,7 +406,7 @@ html[data-theme="dark"] .activity-icon-wrap.tone-neutral {
 
 html[data-theme="dark"] .panel {
   background: var(--surface);
-  border-color: var(--border-color);
+  border-color: var(--border);
   border-radius: 18px;
 }
 
@@ -403,8 +418,12 @@ html[data-theme="dark"] .panel h2 svg {
   color: var(--dt-primary-light);
 }
 
+html[data-theme="dark"] .panel-header {
+  border-bottom-color: var(--border);
+}
+
 html[data-theme="dark"] .quick-link {
-  background: var(--dt-bg-3);
+  background: var(--surface-2);
   color: var(--heading) !important;
 }
 
@@ -423,12 +442,12 @@ html[data-theme="dark"] .empty-state {
 /* Aktivite zaman cizelgesi */
 
 html[data-theme="dark"] .activity-timeline::before {
-  background: var(--border-color);
+  background: var(--border);
 }
 
 html[data-theme="dark"] .activity-card {
-  background: var(--surface);
-  border-color: var(--border-color);
+  background: var(--surface-2);
+  border-color: var(--border);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
@@ -442,7 +461,7 @@ html[data-theme="dark"] .activity-title {
 
 html[data-theme="dark"] .activity-time {
   color: var(--text-secondary);
-  background: var(--dt-bg-3);
+  background: var(--surface);
   font-weight: 600;
 }
 
@@ -456,8 +475,8 @@ html[data-theme="dark"] .activity-employee {
 }
 
 html[data-theme="dark"] .activity-leave-badge {
-  background: var(--dt-bg-3);
-  border-color: var(--border-color);
+  background: var(--surface);
+  border-color: var(--border);
   color: var(--text-primary);
 }
 
@@ -468,9 +487,9 @@ html[data-theme="dark"] .btn-view-all-activities {
 /* Outline butonlar ve ozet kutulari (rapor sayfalari) */
 
 html[data-theme="dark"] .btn-outline {
-  background: var(--dt-bg-3);
+  background: var(--surface-2);
   color: var(--heading);
-  border-color: var(--border-color);
+  border-color: var(--border);
 }
 
 html[data-theme="dark"] .btn-outline svg {
@@ -483,8 +502,8 @@ html[data-theme="dark"] .btn-outline:hover {
 }
 
 html[data-theme="dark"] .report-summary-item {
-  background: var(--dt-bg-3);
-  border-color: var(--border-color);
+  background: var(--surface-2);
+  border-color: var(--border);
   color: var(--text-secondary);
 }
 
