@@ -421,6 +421,60 @@ html[data-theme="dark"] .activity-icon-wrap.tone-neutral {
   color: var(--heading);
 }
 
+html[data-theme="dark"] .conflict-card {
+  --cf-bg: var(--surface);
+  --cf-card: var(--surface-2);
+  --cf-border: var(--border);
+  --cf-heading: var(--heading);
+  --cf-muted: var(--text-secondary);
+  border-color: var(--border);
+}
+
+html[data-theme="dark"] .conflict-panel-icon,
+html[data-theme="dark"] .conflict-warning-icon,
+html[data-theme="dark"] .conflict-summary-icon {
+  background: rgba(211, 163, 118, 0.28);
+  color: var(--dt-primary-light);
+}
+
+html[data-theme="dark"] .conflict-warning,
+html[data-theme="dark"] .conflict-person-card,
+html[data-theme="dark"] .conflict-summary-card {
+  background: rgba(211, 163, 118, 0.14);
+  border-color: rgba(211, 163, 118, 0.35);
+}
+
+html[data-theme="dark"] .conflict-warning-head strong,
+html[data-theme="dark"] .conflict-warning p {
+  color: var(--text-primary);
+}
+
+html[data-theme="dark"] .conflict-summary-value {
+  color: var(--dt-primary-light);
+}
+
+html[data-theme="dark"] .conflict-person-name {
+  color: var(--text-primary);
+}
+
+html[data-theme="dark"] .conflict-clean {
+  background: rgba(76, 175, 80, 0.16);
+  border-color: rgba(76, 175, 80, 0.4);
+}
+
+html[data-theme="dark"] .conflict-clean strong {
+  color: #A6DDA9;
+}
+
+html[data-theme="dark"] .conflict-tip {
+  background: rgba(211, 163, 118, 0.1);
+  border-color: rgba(211, 163, 118, 0.3);
+}
+
+html[data-theme="dark"] .conflict-tip svg {
+  color: var(--dt-primary-light);
+}
+
 html[data-theme="dark"] .panel {
   background: var(--surface);
   border-color: var(--border);

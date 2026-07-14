@@ -1,4 +1,5 @@
 const userRepository = require('../repositories/user.repository');
+const { toTitleCaseTR } = require('../utils/textFormat');
 const activityLogService = require('./activityLog.service');
 
 async function getProfile(userId) {
@@ -12,6 +13,7 @@ async function getProfile(userId) {
 }
 
 async function updateProfile(userId, { full_name, email, profile_photo }) {
+  full_name = toTitleCaseTR(full_name);
   const existing = await userRepository.findByEmail(email);
   if (existing && existing.id !== userId) {
     const error = new Error('Bu e-posta adresi zaten kayitli');

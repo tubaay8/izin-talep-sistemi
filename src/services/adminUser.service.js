@@ -2,6 +2,7 @@ const userRepository = require('../repositories/user.repository');
 const roleRepository = require('../repositories/role.repository');
 const departmentRepository = require('../repositories/department.repository');
 const { hashPassword, generateTemporaryPassword } = require('../utils/password');
+const { toTitleCaseTR } = require('../utils/textFormat');
 const activityLogService = require('./activityLog.service');
 const leaveBalanceService = require('./leaveBalance.service');
 
@@ -102,6 +103,7 @@ async function getUserById(id) {
 }
 
 async function createUser({ full_name, email, role_id, department_id, manager_id }, adminId) {
+  full_name = toTitleCaseTR(full_name);
   const existing = await userRepository.findByEmail(email);
   if (existing) {
     const error = new Error('Bu e-posta adresi zaten kayitli');
@@ -137,6 +139,7 @@ async function createUser({ full_name, email, role_id, department_id, manager_id
 }
 
 async function updateUser(id, adminId, { full_name, email, role_id, department_id, manager_id, is_active, password }) {
+  full_name = toTitleCaseTR(full_name);
   const target = await getUserById(id);
 
   const existing = await userRepository.findByEmail(email);

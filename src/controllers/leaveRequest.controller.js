@@ -34,6 +34,16 @@ async function listMine(req, res) {
   res.json({ requests });
 }
 
+async function getConflicts(req, res) {
+  try {
+    const { start_date, end_date } = req.query;
+    const result = await leaveRequestService.getDepartmentConflicts(req.session.user.id, start_date, end_date);
+    res.json(result);
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
+}
+
 async function getOne(req, res) {
   try {
     const request = await leaveRequestService.getMyLeaveRequestById(req.params.id, req.session.user.id);
@@ -95,4 +105,4 @@ async function downloadReport(req, res) {
   }
 }
 
-module.exports = { create, listMine, getOne, update, cancel, downloadPdf, downloadReport };
+module.exports = { create, listMine, getConflicts, getOne, update, cancel, downloadPdf, downloadReport };

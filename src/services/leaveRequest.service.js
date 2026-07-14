@@ -169,6 +169,22 @@ async function getTeamCalendarEvents(managerId, startDate, endDate, status) {
   return toCalendarEvents(requests);
 }
 
+async function getDepartmentConflicts(userId, startDate, endDate) {
+  assertValidDateRange(startDate, endDate);
+  const user = await userRepository.findByIdDetailed(userId);
+  if (!user || !user.department_id) {
+    return { departmentName: null, conflicts: [], totalOnLeave: 0 };
+  }
+
+  const conflicts = await leaveRequestRepository.findDepartmentConflicts(user.department_id, userId, startDate, endDate);
+
+  return {
+    departmentName: user.department_name,
+    conflicts,
+    totalOnLeave: conflicts.length + 1,
+  };
+}
+
 module.exports = {
   createLeaveRequest,
   getMyLeaveRequests,
@@ -178,4 +194,5 @@ module.exports = {
   getTeamLeaveRequests,
   decideLeaveRequest,
   getTeamCalendarEvents,
+  getDepartmentConflicts,
 };

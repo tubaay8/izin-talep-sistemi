@@ -1,4 +1,5 @@
 const leaveTypeRepository = require('../repositories/leaveType.repository');
+const { toTitleCaseTR } = require('../utils/textFormat');
 
 async function getAllLeaveTypes() {
   return leaveTypeRepository.findAll();
@@ -15,6 +16,7 @@ async function getLeaveTypeById(id) {
 }
 
 async function createLeaveType({ name, description }) {
+  name = toTitleCaseTR(name);
   try {
     const id = await leaveTypeRepository.create({ name, description });
     return leaveTypeRepository.findById(id);
@@ -29,6 +31,7 @@ async function createLeaveType({ name, description }) {
 }
 
 async function updateLeaveType(id, { name, description }) {
+  name = toTitleCaseTR(name);
   await getLeaveTypeById(id);
   try {
     await leaveTypeRepository.update(id, { name, description });

@@ -81,6 +81,7 @@ async function loadExistingRequest() {
   }
 
   updateReportFieldVisibility();
+  checkDepartmentConflicts();
 }
 
 form.addEventListener('submit', async (event) => {
@@ -125,3 +126,103 @@ loadLeaveTypes().then(() => {
     updateReportFieldVisibility();
   }
 });
+
+/* ---------- Departman cakisma analizi ---------- */
+
+const startDateInput = document.getElementById('start_date');
+const endDateInput = document.getElementById('end_date');
+const conflictCleanEl = document.getElementById('conflict-clean');
+const conflictCleanTitleEl = document.getElementById('conflict-clean-title');
+const conflictCleanTextEl = document.getElementById('conflict-clean-text');
+const conflictWarningEl = document.getElementById('conflict-warning');
+const conflictWarningTextEl = document.getElementById('conflict-warning-text');
+const conflictPeopleEl = document.getElementById('conflict-people');
+const conflictPersonListEl = document.getElementById('conflict-person-list');
+const conflictSummaryCardEl = document.getElementById('conflict-summary-card');
+const conflictSummaryValueEl = document.getElementById('conflict-summary-value');
+const conflictTipEl = document.getElementById('conflict-tip');
+
+function getInitials(fullName) {
+  return fullName
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join('');
+}
+
+function formatDateTR(value) {
+  const date = new Date(`${value}T00:00:00`);
+  return date.toLocaleDateString('tr-TR');
+}
+
+function showConflictState(state) {
+  conflictCleanEl.hidden = state === 'warning';
+  conflictWarningEl.hidden = state !== 'warning';
+  conflictPeopleEl.hidden = state !== 'warning';
+  conflictSummaryCardEl.hidden = state !== 'warning';
+  conflictTipEl.hidden = state !== 'warning';
+}
+
+function renderConflicts(data) {
+  if (!data.conflicts.length) {
+    conflictCleanTitleEl.textContent = 'Çakışma bulunamadı';
+    conflictCleanTextEl.textContent = 'Bu tarih aralığında departmanda iş yükünü etkileyecek bir durum görünmüyor.';
+    showConflictState('clean');
+    return;
+  }
+
+  showConflictState('warning');
+  conflictWarningTextEl.textContent = `Seçilen tarihlerde ${data.departmentName} departmanında ${data.conflicts.length} kişi daha izinli olacaktır.`;
+  conflictSummaryValueEl.textContent = `${data.totalOnLeave} Personel`;
+
+  conflictPersonListEl.innerHTML = data.conflicts
+    .map((item) => {
+      const statusLabel = item.status === 'approved' ? 'Onaylandı' : 'Bekliyor';
+      return `
+        <div class="conflict-person-card">
+          <div class="conflict-person-top">
+            <span class="conflict-person-avatar">${getInitials(item.employee_name)}</span>
+            <div class="conflict-person-info">
+              <div class="conflict-person-name">${item.employee_name}</div>
+              <div class="conflict-person-type">${item.leave_type_name}</div>
+            </div>
+            <span class="status-badge status-${item.status}">${statusLabel}</span>
+          </div>
+          <div class="conflict-person-dates">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/></svg>
+            ${formatDateTR(item.start_date.slice(0, 10))} - ${formatDateTR(item.end_date.slice(0, 10))}
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+}
+
+async function checkDepartmentConflicts() {
+  const startDate = startDateInput.value;
+  const endDate = endDateInput.value;
+
+  if (!startDate || !endDate || endDate < startDate) {
+    conflictCleanTitleEl.textContent = 'Tarih aralığı seçilmedi';
+    conflictCleanTextEl.textContent = 'Başlangıç ve bitiş tarihi seçtiğinizde çakışma analizi burada görünecek.';
+    showConflictState('clean');
+    return;
+  }
+
+  try {
+    const params = new URLSearchParams({ start_date: startDate, end_date: endDate });
+    const res = await fetch(`/api/leave-requests/conflicts?${params}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.departmentName) return;
+    renderConflicts(data);
+  } catch (err) {
+    // sessiz basarisizlik: form gonderimini engellemeyecek ikincil bir panel
+  }
+}
+
+showConflictState('clean');
+
+startDateInput.addEventListener('change', checkDepartmentConflicts);
+endDateInput.addEventListener('change', checkDepartmentConflicts);

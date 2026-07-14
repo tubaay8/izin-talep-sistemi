@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Izin Takvimi - Izin Talep Sistemi</title>
-  <link rel="stylesheet" href="/css/style.css?v=20" />
-  <link rel="stylesheet" href="/css/dark-theme.css?v=10" />
+  <link rel="stylesheet" href="/css/style.css?v=22" />
+  <link rel="stylesheet" href="/css/dark-theme.css?v=12" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#8C6E63" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
@@ -102,6 +102,10 @@
             <label for="filter-search">Ara</label>
             <input type="text" id="filter-search" placeholder="Personel adi..." />
           </div>
+          <button type="button" id="btn-schedule-pdf" class="btn-outline calendar-pdf-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M12 10v6M9.5 13.5L12 16l2.5-2.5"/></svg>
+            Aylik Cizelgeyi PDF Indir
+          </button>
         </div>
         <div class="leave-calendar" id="leave-calendar"></div>
       </div>
@@ -156,6 +160,9 @@
   <script src="/vendor/fullcalendar-daygrid.min.js"></script>
   <script src="/vendor/fullcalendar-timegrid.min.js"></script>
   <script src="/vendor/fullcalendar-locale-tr.min.js"></script>
+  <script src="/vendor/jspdf.umd.min.js"></script>
+  <script src="/vendor/jspdf.plugin.autotable.min.js"></script>
+  <script src="/js/reportExport.js"></script>
   <script src="/js/leaveCalendar.js"></script>
   <script src="/js/admin-calendar.js"></script>
   <script src="/js/adminSidebar.js"></script>

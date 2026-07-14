@@ -252,6 +252,21 @@ async function findCalendarEventsForAdmin(startDate, endDate, departmentId, stat
   return rows;
 }
 
+async function findDepartmentConflicts(departmentId, userId, startDate, endDate) {
+  const [rows] = await pool.query(
+    `SELECT ${SELECT_FIELDS}, u.full_name AS employee_name
+     FROM leave_requests lr
+     JOIN leave_types lt ON lt.id = lr.leave_type_id
+     JOIN users u ON u.id = lr.user_id
+     WHERE u.department_id = ? AND u.id != ?
+       AND lr.start_date <= ? AND lr.end_date >= ?
+       AND lr.status IN ('pending', 'approved')
+     ORDER BY lr.start_date`,
+    [departmentId, userId, endDate, startDate]
+  );
+  return rows;
+}
+
 async function findApprovedQuotaRequestsForUserYear(userId, year) {
   const [rows] = await pool.query(
     `SELECT lr.start_date, lr.end_date
@@ -297,4 +312,5 @@ module.exports = {
   findApprovedQuotaRequestsForUserYear,
   findCalendarEventsForManager,
   findCalendarEventsForAdmin,
+  findDepartmentConflicts,
 };
