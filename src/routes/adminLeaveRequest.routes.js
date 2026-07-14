@@ -7,6 +7,7 @@ const { reportUpload, handleUploadError } = require('../middlewares/reportUpload
 const router = express.Router();
 
 router.get('/', adminLeaveRequestController.list);
+router.get('/calendar', adminLeaveRequestController.calendar);
 router.get('/:id', adminLeaveRequestController.getOne);
 router.put(
   '/:id',

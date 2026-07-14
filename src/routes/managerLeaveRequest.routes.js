@@ -6,6 +6,7 @@ const validate = require('../middlewares/validate.middleware');
 const router = express.Router();
 
 router.get('/', managerLeaveRequestController.listTeamRequests);
+router.get('/calendar', managerLeaveRequestController.calendar);
 router.patch('/:id/decision', decisionValidation, validate, managerLeaveRequestController.decide);
 
 module.exports = router;

@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Izin Turu Yonetimi - Izin Talep Sistemi</title>
-  <link rel="stylesheet" href="/css/style.css?v=15" />
-  <link rel="stylesheet" href="/css/dark-theme.css?v=5" />
+  <link rel="stylesheet" href="/css/style.css?v=20" />
+  <link rel="stylesheet" href="/css/dark-theme.css?v=10" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#8C6E63" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
@@ -21,7 +21,7 @@
     <nav class="sidebar-menu">
       <a href="/dashboard" class="sidebar-link">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        <span class="sidebar-label">Dashboard</span>
+        <span class="sidebar-label">Anasayfa</span>
       </a>
       <a href="/admin/users" class="sidebar-link">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 13.5c2.8.3 5 2.5 5 5.5"/></svg>
@@ -30,6 +30,10 @@
       <a href="/admin/leave-requests" class="sidebar-link">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
         <span class="sidebar-label">Tüm İzin Talepleri</span>
+      </a>
+      <a href="/admin/calendar" class="sidebar-link">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><circle cx="8" cy="15" r="1"/><circle cx="12" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>
+        <span class="sidebar-label">Takvim</span>
       </a>
       <a href="/admin/departments" class="sidebar-link">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/></svg>
@@ -69,9 +73,6 @@
   <main class="page-card">
     <div class="page-header">
       <h1><span class="brand-logo">İT</span> Izin Turu Yonetimi</h1>
-      <div>
-        <a href="/dashboard">Anasayfa</a>
-      </div>
     </div>
 
     <form id="create-form" class="filter-bar">

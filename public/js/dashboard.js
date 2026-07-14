@@ -14,6 +14,7 @@ const ICONS = {
   plusCircle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
   grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
   calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
+  calendarView: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><circle cx="8" cy="15" r="1"/><circle cx="12" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>',
   barChart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/><path d="M2 20h20"/></svg>',
   edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>',
 };
@@ -188,6 +189,8 @@ function activityCard(activity) {
   `;
 }
 
+const ACTIVITY_PAGE_SIZE = 10;
+
 function buildActivityPanel(activities) {
   if (!activities.length) {
     return `
@@ -198,42 +201,60 @@ function buildActivityPanel(activities) {
     `;
   }
 
-  const visibleCount = 8;
-  const initial = activities.slice(0, visibleCount);
-  const rest = activities.slice(visibleCount);
-
   return `
     <div class="panel">
       <div class="panel-header"><h2>${ICONS.clock}Son Aktiviteler</h2></div>
       <div class="activity-timeline" id="activity-timeline">
-        ${initial.map(activityCard).join('')}
+        ${activities.map(activityCard).join('')}
       </div>
-      ${
-        rest.length
-          ? `<div id="activity-hidden" hidden>${rest.map(activityCard).join('')}</div>
-             <div class="activity-footer">
-               <button type="button" class="btn-view-all-activities" id="btn-view-all-activities">Tüm Aktiviteleri Gör</button>
-             </div>`
-          : ''
-      }
+      <div class="pagination" id="activity-pagination" hidden></div>
     </div>
   `;
 }
 
-document.addEventListener('click', (event) => {
-  const btn = event.target.closest('#btn-view-all-activities');
-  if (!btn) return;
-  const hidden = document.getElementById('activity-hidden');
+function initActivityPagination(initialActivities) {
+  const paginationEl = document.getElementById('activity-pagination');
+  if (!paginationEl || !initialActivities.length) return;
+
+  renderPagination(paginationEl, {
+    page: 1,
+    hasNext: initialActivities.length >= ACTIVITY_PAGE_SIZE,
+    onChange: loadActivityPage,
+  });
+}
+
+async function loadActivityPage(page) {
   const timeline = document.getElementById('activity-timeline');
-  if (hidden && timeline) {
-    timeline.insertAdjacentHTML('beforeend', hidden.innerHTML);
-    hidden.remove();
+  const paginationEl = document.getElementById('activity-pagination');
+  if (!timeline || !paginationEl) return;
+
+  try {
+    const res = await fetch(`/api/stats/activities?page=${page}&limit=${ACTIVITY_PAGE_SIZE}`);
+    if (!res.ok) return;
+    const data = await res.json();
+
+    timeline.innerHTML = data.activities.length
+      ? data.activities.map(activityCard).join('')
+      : emptyState('Bu sayfada aktivite bulunmuyor.');
+
+    renderPagination(paginationEl, {
+      page: data.pagination.page,
+      totalPages: data.pagination.totalPages,
+      onChange: loadActivityPage,
+    });
+  } catch (err) {
+    // Sunucuya ulasilamadi, kullanici butona tekrar tiklayarak deneyebilir.
   }
-  btn.closest('.activity-footer').remove();
-});
+}
 
 function renderPersonnelDashboard(user, data) {
   document.getElementById('stats-grid').innerHTML = [
+    statCard({
+      icon: 'award',
+      tone: 'tone-info',
+      value: `${data.leaveBalance.remainingDays}/${data.leaveBalance.entitledDays}`,
+      label: `${data.leaveBalance.year} Yillik Izin Sayisi (Kalan/Toplam)`,
+    }),
     statCard({ icon: 'list', tone: 'tone-neutral', value: data.stats.total, label: 'Toplam Izin Talebi' }),
     statCard({ icon: 'clock', tone: 'tone-pending', value: data.stats.pending, label: 'Bekleyen Talepler' }),
     statCard({ icon: 'check', tone: 'tone-approved', value: data.stats.approved, label: 'Onaylanan Talepler' }),
@@ -266,6 +287,7 @@ function renderPersonnelDashboard(user, data) {
     </div>
     ${buildActivityPanel(data.activities)}
   `;
+  initActivityPagination(data.activities);
 
   document.getElementById('sidebar-menu').innerHTML = [
     sidebarLink('/dashboard', 'grid', 'Dashboard', true),
@@ -341,6 +363,7 @@ function renderManagerDashboard(user, data) {
     </div>
     ${buildActivityPanel(data.activities)}
   `;
+  initActivityPagination(data.activities);
 
   const recentBody = document.getElementById('manager-recent-body');
   if (recentBody) {
@@ -358,6 +381,7 @@ function renderManagerDashboard(user, data) {
   document.getElementById('sidebar-menu').innerHTML = [
     sidebarLink('/dashboard', 'grid', 'Dashboard', true),
     sidebarLink('/manager/leave-requests', 'list', 'Ekip Talepleri', false),
+    sidebarLink('/manager/calendar', 'calendarView', 'Takvim', false),
     sidebarLink('/manager/reports', 'barChart', 'Ekip Izin Raporu', false),
   ].join('');
 }
@@ -433,11 +457,13 @@ function renderAdminDashboard(user, data) {
     </div>
     ${buildActivityPanel(data.activities)}
   `;
+  initActivityPagination(data.activities);
 
   document.getElementById('sidebar-menu').innerHTML = [
     sidebarLink('/dashboard', 'grid', 'Dashboard', true),
     sidebarLink('/admin/users', 'users', 'Kullanici Yonetimi', false),
     sidebarLink('/admin/leave-requests', 'list', 'Tum Izin Talepleri', false),
+    sidebarLink('/admin/calendar', 'calendarView', 'Takvim', false),
     sidebarLink('/admin/departments', 'building', 'Departman Yonetimi', false),
     sidebarLink('/admin/leave-types', 'calendar', 'Izin Turu Yonetimi', false),
     sidebarLink('/admin/reports', 'barChart', 'Raporlar', false),

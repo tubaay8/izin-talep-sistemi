@@ -1,7 +1,10 @@
 const leaveRequestRepository = require('../repositories/leaveRequest.repository');
 const userRepository = require('../repositories/user.repository');
+const leaveTypeRepository = require('../repositories/leaveType.repository');
 const { assertValidDateRange, assertLeaveTypeExists, assertReportProvided } = require('../utils/leaveRequestValidators');
 const activityLogService = require('./activityLog.service');
+const leaveBalanceService = require('./leaveBalance.service');
+const { toCalendarEvents } = require('../utils/calendarEvent');
 
 async function getOwnedPendingRequest(id, userId) {
   const request = await leaveRequestRepository.findById(id);
@@ -22,6 +25,7 @@ async function createLeaveRequest({ user_id, leave_type_id, start_date, end_date
   assertValidDateRange(start_date, end_date);
   const leaveType = await assertLeaveTypeExists(leave_type_id);
   assertReportProvided(leaveType, report_file);
+  await leaveBalanceService.assertSufficientBalance(user_id, leaveType, start_date, end_date);
 
   const id = await leaveRequestRepository.create({ user_id, leave_type_id, start_date, end_date, reason, report_file });
   const request = await leaveRequestRepository.findById(id);
@@ -86,8 +90,32 @@ async function cancelLeaveRequest(id, userId) {
   return request;
 }
 
-async function getTeamLeaveRequests(managerId, filters) {
-  return leaveRequestRepository.findAllByManagerId(managerId, filters);
+async function attachLeaveBalances(items) {
+  if (!items.length) return items;
+  const balances = await leaveBalanceService.getBalancesForUsers(items.map((item) => item.user_id));
+  return items.map((item) => ({ ...item, leave_balance: balances[item.user_id] }));
+}
+
+async function getTeamLeaveRequests(managerId, filters, pagination) {
+  if (pagination && pagination.limit) {
+    const [rawItems, total] = await Promise.all([
+      leaveRequestRepository.findAllByManagerId(managerId, filters, pagination),
+      leaveRequestRepository.countFilteredByManagerId(managerId, filters),
+    ]);
+    const items = await attachLeaveBalances(rawItems);
+    return {
+      items,
+      pagination: {
+        page: pagination.page,
+        limit: pagination.limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / pagination.limit)),
+      },
+    };
+  }
+  const rawItems = await leaveRequestRepository.findAllByManagerId(managerId, filters);
+  const items = await attachLeaveBalances(rawItems);
+  return { items, pagination: null };
 }
 
 async function decideLeaveRequest(id, managerId, { decision, approval_note }) {
@@ -111,8 +139,19 @@ async function decideLeaveRequest(id, managerId, { decision, approval_note }) {
     throw error;
   }
 
+  const leaveType = await leaveTypeRepository.findById(request.leave_type_id);
+
   await leaveRequestRepository.decide(id, { status: decision, approved_by: managerId, approval_note });
   const updated = await leaveRequestRepository.findById(id);
+
+  await leaveBalanceService.adjustBalanceForStatusChange({
+    userId: request.user_id,
+    leaveType,
+    startDate: request.start_date,
+    endDate: request.end_date,
+    oldStatus: request.status,
+    newStatus: decision,
+  });
 
   await activityLogService.log({
     actorId: managerId,
@@ -125,6 +164,11 @@ async function decideLeaveRequest(id, managerId, { decision, approval_note }) {
   return updated;
 }
 
+async function getTeamCalendarEvents(managerId, startDate, endDate, status) {
+  const requests = await leaveRequestRepository.findCalendarEventsForManager(managerId, startDate, endDate, status);
+  return toCalendarEvents(requests);
+}
+
 module.exports = {
   createLeaveRequest,
   getMyLeaveRequests,
@@ -133,4 +177,5 @@ module.exports = {
   cancelLeaveRequest,
   getTeamLeaveRequests,
   decideLeaveRequest,
+  getTeamCalendarEvents,
 };

@@ -25,11 +25,19 @@ async function findById(id) {
   return rows[0] || null;
 }
 
-async function create({ full_name, email, passwordHash, role_id, department_id, manager_id = null }) {
+async function create({
+  full_name,
+  email,
+  passwordHash,
+  role_id,
+  department_id,
+  manager_id = null,
+  must_change_password = false,
+}) {
   const [result] = await pool.query(
-    `INSERT INTO users (full_name, email, password, role_id, department_id, manager_id)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [full_name, email, passwordHash, role_id, department_id, manager_id]
+    `INSERT INTO users (full_name, email, password, role_id, department_id, manager_id, must_change_password)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [full_name, email, passwordHash, role_id, department_id, manager_id, must_change_password ? 1 : 0]
   );
   return result.insertId;
 }
@@ -92,9 +100,15 @@ function buildUserFilters(filters = {}) {
   return { clauses, params };
 }
 
-async function findAll(filters = {}) {
+async function findAll(filters = {}, pagination = null) {
   const { clauses, params } = buildUserFilters(filters);
   const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+
+  let limitClause = '';
+  if (pagination && pagination.limit) {
+    limitClause = ' LIMIT ? OFFSET ?';
+    params.push(pagination.limit, (pagination.page - 1) * pagination.limit);
+  }
 
   const [rows] = await pool.query(
     `SELECT ${ADMIN_SELECT_FIELDS}
@@ -103,10 +117,26 @@ async function findAll(filters = {}) {
      JOIN departments d ON d.id = u.department_id
      LEFT JOIN users m ON m.id = u.manager_id
      ${where}
-     ORDER BY u.is_active DESC, u.full_name ASC`,
+     ORDER BY u.is_active DESC, u.full_name ASC${limitClause}`,
     params
   );
   return rows;
+}
+
+async function countFiltered(filters = {}) {
+  const { clauses, params } = buildUserFilters(filters);
+  const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+
+  const [rows] = await pool.query(
+    `SELECT COUNT(*) AS total
+     FROM users u
+     JOIN roles r ON r.id = u.role_id
+     JOIN departments d ON d.id = u.department_id
+     LEFT JOIN users m ON m.id = u.manager_id
+     ${where}`,
+    params
+  );
+  return rows[0].total;
 }
 
 async function findByIdDetailed(id) {
@@ -134,6 +164,10 @@ async function update(id, { full_name, email, role_id, department_id, manager_id
 
 async function updatePassword(id, passwordHash) {
   await pool.query('UPDATE users SET password = ? WHERE id = ?', [passwordHash, id]);
+}
+
+async function updatePasswordAndClearMustChange(id, passwordHash) {
+  await pool.query('UPDATE users SET password = ?, must_change_password = 0 WHERE id = ?', [passwordHash, id]);
 }
 
 async function updateOwnProfile(id, { full_name, email, profile_photo }) {
@@ -185,9 +219,11 @@ module.exports = {
   findManagers,
   findAvailableManagers,
   findAll,
+  countFiltered,
   findByIdDetailed,
   update,
   updatePassword,
+  updatePasswordAndClearMustChange,
   updateOwnProfile,
   countByManagerId,
   countByActiveStatus,

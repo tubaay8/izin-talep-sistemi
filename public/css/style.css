@@ -1267,12 +1267,6 @@ body.admin-layout .form-card {
 
 /* Reports */
 
-.report-meta {
-  color: var(--color-muted);
-  font-size: 0.85rem;
-  margin-top: -0.25rem;
-}
-
 .report-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1454,6 +1448,53 @@ body.admin-layout .form-card {
   color: var(--color-navy);
 }
 
+/* Pagination */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #fff;
+  color: var(--color-navy);
+  border: 1px solid var(--color-accent-light);
+  padding: 0.5rem 0.95rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.pagination-btn svg {
+  width: 15px;
+  height: 15px;
+  color: var(--color-accent);
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--color-bg);
+  border-color: var(--color-accent);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
 @media print {
   .no-print {
     display: none !important;
@@ -1489,5 +1530,336 @@ body.admin-layout .form-card {
   .btn-primary {
     min-width: 0;
     width: 100%;
+  }
+}
+
+/* Izin takvimi */
+
+.calendar-layout {
+  display: grid;
+  grid-template-columns: 74fr 26fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.calendar-card {
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.calendar-toolbar-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  padding: 1rem 1.25rem;
+}
+
+.calendar-toolbar-filters .filter-field {
+  min-width: 150px;
+}
+
+.filter-field--search {
+  flex-grow: 1;
+  min-width: 200px;
+}
+
+.calendar-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.calendar-panel {
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calendar-panel:hover {
+  transform: translateY(-2px);
+}
+
+.calendar-panel h2 {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  color: var(--color-navy);
+}
+
+.calendar-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.calendar-legend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.calendar-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.calendar-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.calendar-summary-item:last-child {
+  border-bottom: none;
+}
+
+.calendar-summary-icon.stat-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.calendar-summary-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.calendar-summary-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.calendar-summary-label {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+
+.calendar-summary-item strong {
+  color: var(--color-navy);
+  font-size: 1.15rem;
+}
+
+.leave-calendar {
+  padding: 1.25rem;
+  --fc-border-color: var(--color-border);
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: var(--color-bg);
+  --fc-today-bg-color: rgba(211, 163, 118, 0.18);
+  --fc-button-bg-color: var(--color-accent);
+  --fc-button-border-color: var(--color-accent);
+  --fc-button-hover-bg-color: var(--color-accent-dark);
+  --fc-button-hover-border-color: var(--color-accent-dark);
+  --fc-button-active-bg-color: var(--color-accent-dark);
+  --fc-button-active-border-color: var(--color-accent-dark);
+}
+
+.leave-calendar .fc {
+  font-family: inherit;
+}
+
+.leave-calendar .fc-toolbar-title {
+  color: var(--color-navy);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.leave-calendar .fc-col-header-cell-cushion,
+.leave-calendar .fc-daygrid-day-number,
+.leave-calendar .fc-timegrid-slot-label-cushion {
+  color: var(--color-navy);
+}
+
+.leave-calendar .fc-event {
+  cursor: pointer;
+  border-width: 1px;
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: #fff;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.leave-calendar .fc-daygrid-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(62, 37, 34, 0.25);
+}
+
+.leave-calendar .fc-event.fc-event-pending {
+  border-style: dashed;
+  border-width: 2px;
+  opacity: 0.85;
+}
+
+/* Gun yogunlugu (kac izin cakisiyor) */
+
+.leave-calendar .fc-daygrid-day.fc-day-density-1 {
+  background: rgba(140, 110, 99, 0.08);
+}
+
+.leave-calendar .fc-daygrid-day.fc-day-density-2 {
+  background: rgba(140, 110, 99, 0.16);
+}
+
+.leave-calendar .fc-daygrid-day.fc-day-density-3 {
+  background: rgba(140, 110, 99, 0.28);
+}
+
+/* Hover tooltip */
+
+.leave-event-tooltip {
+  position: fixed;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-width: 240px;
+  background: var(--card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 14px 30px rgba(62, 37, 34, 0.22);
+  padding: 0.75rem 0.9rem;
+  font-size: 0.8rem;
+  color: var(--color-text);
+  pointer-events: none;
+}
+
+.leave-event-tooltip strong {
+  color: var(--color-navy);
+  font-size: 0.88rem;
+}
+
+.leave-event-tooltip-type {
+  font-weight: 600;
+}
+
+.leave-event-tooltip-status {
+  align-self: flex-start;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.leave-event-tooltip-status--pending {
+  background: #F5DFC4;
+  color: var(--badge-yellow);
+}
+
+.leave-event-tooltip-status--approved {
+  background: #E8F5E9;
+  color: var(--badge-green);
+}
+
+/* Bugun izinli olanlar */
+
+.today-leave-section {
+  margin-top: 1.5rem;
+}
+
+.today-leave-section h2 {
+  font-size: 1.05rem;
+  color: var(--color-navy);
+  margin: 0 0 1rem;
+}
+
+.today-leave-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.today-leave-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 20px rgba(62, 37, 34, 0.1);
+  padding: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.today-leave-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px rgba(62, 37, 34, 0.18);
+}
+
+.today-leave-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.today-leave-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.today-leave-info strong {
+  color: var(--color-navy);
+  font-size: 0.92rem;
+}
+
+.today-leave-info span {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+
+.today-leave-type {
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .calendar-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .leave-calendar {
+    padding: 0.75rem;
+  }
+
+  .leave-calendar .fc-toolbar {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .calendar-toolbar-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .today-leave-list {
+    grid-template-columns: 1fr;
   }
 }

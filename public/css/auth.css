@@ -77,55 +77,39 @@ body {
   position: relative;
   width: 100%;
   max-width: 1100px;
-  height: 660px;
+  min-height: 660px;
   max-height: calc(100vh - 3rem);
   background: #fff;
   border-radius: var(--auth-radius);
   box-shadow: 0 30px 70px rgba(62, 37, 34, 0.2);
   overflow: hidden;
+  display: flex;
 }
 
-/* Form panels */
+/* Form panel */
 
 .form-panel {
-  position: absolute;
-  top: 0;
   width: 50%;
-  height: 100%;
   display: flex;
   align-items: safe center;
   justify-content: center;
   padding: 2.5rem 3.5rem;
   background: #fff;
-  transition: opacity 400ms ease 150ms;
   overflow-y: auto;
-}
-
-.form-panel--login {
-  left: 0;
-  z-index: 2;
-}
-
-.form-panel--register {
-  left: 50%;
-  z-index: 1;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.auth-card.show-register .form-panel--register {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.auth-card.show-register .form-panel--login {
-  opacity: 0;
-  pointer-events: none;
 }
 
 .form-inner {
   width: 100%;
   max-width: 340px;
+}
+
+.auth-card--single {
+  max-width: 440px;
+  min-height: 0;
+}
+
+.auth-card--single .form-panel {
+  width: 100%;
 }
 
 .auth-brand {
@@ -267,21 +251,12 @@ body {
   color: #4CAF50;
 }
 
-/* Overlay (sliding) panel */
+/* Overlay panel */
 
 .overlay-panel {
-  position: absolute;
-  top: 0;
-  left: 50%;
+  position: relative;
   width: 50%;
-  height: 100%;
-  z-index: 5;
   background: linear-gradient(rgba(62, 37, 34, 0.8), rgba(62, 37, 34, 0.8)), url('/images/sirket.jpg') center center / cover no-repeat;
-  transition: transform 600ms cubic-bezier(0.65, 0, 0.35, 1);
-}
-
-.auth-card.show-register .overlay-panel {
-  transform: translateX(-100%);
 }
 
 .overlay-inner {
@@ -294,23 +269,6 @@ body {
   text-align: center;
   padding: 3rem 2.5rem;
   color: #fff;
-  opacity: 1;
-  transition: opacity 300ms ease;
-}
-
-.overlay-inner--register {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.auth-card.show-register .overlay-inner--register {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.auth-card.show-register .overlay-inner--login {
-  opacity: 0;
-  pointer-events: none;
 }
 
 .overlay-inner .brand-logo {
@@ -321,6 +279,16 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.35);
   font-size: 0.85rem;
   margin-bottom: 1.1rem;
+}
+
+.overlay-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--auth-light);
+  opacity: 0.85;
+  margin: 0 0 0.35rem;
 }
 
 .overlay-inner h2 {
@@ -335,32 +303,10 @@ body {
   margin: 0 0 1.75rem;
 }
 
-.overlay-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.65rem 2.25rem;
-  background: transparent;
-  color: #fff;
-  border: 1.5px solid rgba(255, 255, 255, 0.7);
-  border-radius: var(--auth-radius-sm);
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background-color 0.15s ease;
-}
-
-.overlay-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
 /* Responsive */
 
 @media (max-width: 820px) {
   .auth-card {
-    position: static;
-    display: flex;
     flex-direction: column;
     height: auto;
     max-width: 440px;
@@ -369,54 +315,22 @@ body {
 
   .overlay-panel,
   .form-panel {
-    position: static;
     width: 100%;
-    height: auto;
-    transform: none !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
     padding: 2rem 1.75rem;
-    transition: none;
   }
 
   .overlay-panel {
     order: 1;
+    min-height: 220px;
   }
 
   .overlay-inner {
     position: static;
     padding: 0;
-    display: none;
   }
 
-  .overlay-inner--login {
-    display: flex;
-  }
-
-  .auth-card.show-register .overlay-inner--login {
-    display: none;
-  }
-
-  .auth-card.show-register .overlay-inner--register {
-    display: flex;
-  }
-
-  .form-panel--login {
+  .form-panel {
     order: 2;
-    display: flex;
-  }
-
-  .form-panel--register {
-    order: 2;
-    display: none;
-  }
-
-  .auth-card.show-register .form-panel--login {
-    display: none;
-  }
-
-  .auth-card.show-register .form-panel--register {
-    display: flex;
   }
 }
 

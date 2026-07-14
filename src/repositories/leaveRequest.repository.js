@@ -66,9 +66,16 @@ async function cancel(id) {
   await pool.query(`UPDATE leave_requests SET status = 'cancelled' WHERE id = ?`, [id]);
 }
 
-async function findAllByManagerId(managerId, filters = {}) {
+async function findAllByManagerId(managerId, filters = {}, pagination = null) {
   const { clauses, params } = buildLeaveRequestFilters(filters);
   const extraWhere = clauses.length ? ` AND ${clauses.join(' AND ')}` : '';
+
+  const queryParams = [managerId, ...params];
+  let limitClause = '';
+  if (pagination && pagination.limit) {
+    limitClause = ' LIMIT ? OFFSET ?';
+    queryParams.push(pagination.limit, (pagination.page - 1) * pagination.limit);
+  }
 
   const [rows] = await pool.query(
     `SELECT ${SELECT_FIELDS}, u.full_name AS employee_name, d.name AS department_name
@@ -77,10 +84,26 @@ async function findAllByManagerId(managerId, filters = {}) {
      JOIN users u ON u.id = lr.user_id
      JOIN departments d ON d.id = u.department_id
      WHERE u.manager_id = ?${extraWhere}
-     ORDER BY lr.created_at DESC`,
-    [managerId, ...params]
+     ORDER BY lr.created_at DESC${limitClause}`,
+    queryParams
   );
   return rows;
+}
+
+async function countFilteredByManagerId(managerId, filters = {}) {
+  const { clauses, params } = buildLeaveRequestFilters(filters);
+  const extraWhere = clauses.length ? ` AND ${clauses.join(' AND ')}` : '';
+
+  const [rows] = await pool.query(
+    `SELECT COUNT(*) AS total
+     FROM leave_requests lr
+     JOIN leave_types lt ON lt.id = lr.leave_type_id
+     JOIN users u ON u.id = lr.user_id
+     JOIN departments d ON d.id = u.department_id
+     WHERE u.manager_id = ?${extraWhere}`,
+    [managerId, ...params]
+  );
+  return rows[0].total;
 }
 
 async function decide(id, { status, approved_by, approval_note }) {
@@ -141,15 +164,29 @@ const ADMIN_JOINS = `
   LEFT JOIN users ab ON ab.id = lr.approved_by
 `;
 
-async function findAllForAdmin(filters = {}) {
+async function findAllForAdmin(filters = {}, pagination = null) {
   const { clauses, params } = buildLeaveRequestFilters(filters);
   const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
 
+  let limitClause = '';
+  if (pagination && pagination.limit) {
+    limitClause = ' LIMIT ? OFFSET ?';
+    params.push(pagination.limit, (pagination.page - 1) * pagination.limit);
+  }
+
   const [rows] = await pool.query(
-    `SELECT ${ADMIN_SELECT_FIELDS} ${ADMIN_JOINS} ${where} ORDER BY lr.created_at DESC`,
+    `SELECT ${ADMIN_SELECT_FIELDS} ${ADMIN_JOINS} ${where} ORDER BY lr.created_at DESC${limitClause}`,
     params
   );
   return rows;
+}
+
+async function countFilteredForAdmin(filters = {}) {
+  const { clauses, params } = buildLeaveRequestFilters(filters);
+  const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+
+  const [rows] = await pool.query(`SELECT COUNT(*) AS total ${ADMIN_JOINS} ${where}`, params);
+  return rows[0].total;
 }
 
 async function findByIdForAdmin(id) {
@@ -164,6 +201,65 @@ async function countDecidedTodayByManager(managerId) {
      WHERE lr.approved_by = ? AND DATE(lr.decided_at) = CURDATE() AND lr.status IN ('approved', 'rejected')
      GROUP BY lr.status`,
     [managerId]
+  );
+  return rows;
+}
+
+function calendarStatusClause(status) {
+  if (status === 'pending' || status === 'approved') {
+    return { clause: 'lr.status = ?', param: status };
+  }
+  return { clause: "lr.status IN ('pending', 'approved')", param: null };
+}
+
+async function findCalendarEventsForManager(managerId, startDate, endDate, status) {
+  const { clause, param } = calendarStatusClause(status);
+  const params = [managerId, endDate, startDate];
+  if (param) params.push(param);
+
+  const [rows] = await pool.query(
+    `SELECT ${SELECT_FIELDS}, u.full_name AS employee_name, d.name AS department_name
+     FROM leave_requests lr
+     JOIN leave_types lt ON lt.id = lr.leave_type_id
+     JOIN users u ON u.id = lr.user_id
+     JOIN departments d ON d.id = u.department_id
+     WHERE u.manager_id = ?
+       AND lr.start_date <= ? AND lr.end_date >= ?
+       AND ${clause}
+     ORDER BY lr.start_date`,
+    params
+  );
+  return rows;
+}
+
+async function findCalendarEventsForAdmin(startDate, endDate, departmentId, status) {
+  const { clause, param } = calendarStatusClause(status);
+  const params = [endDate, startDate];
+  let departmentClause = '';
+  if (departmentId) {
+    departmentClause = ' AND u.department_id = ?';
+    params.push(departmentId);
+  }
+  if (param) params.push(param);
+
+  const [rows] = await pool.query(
+    `SELECT ${ADMIN_SELECT_FIELDS} ${ADMIN_JOINS}
+     WHERE lr.start_date <= ? AND lr.end_date >= ?${departmentClause}
+       AND ${clause}
+     ORDER BY lr.start_date`,
+    params
+  );
+  return rows;
+}
+
+async function findApprovedQuotaRequestsForUserYear(userId, year) {
+  const [rows] = await pool.query(
+    `SELECT lr.start_date, lr.end_date
+     FROM leave_requests lr
+     JOIN leave_types lt ON lt.id = lr.leave_type_id
+     WHERE lr.user_id = ? AND lr.status = 'approved' AND lt.counts_toward_quota = 1
+       AND YEAR(lr.start_date) = ?`,
+    [userId, year]
   );
   return rows;
 }
@@ -187,13 +283,18 @@ module.exports = {
   update,
   cancel,
   findAllByManagerId,
+  countFilteredByManagerId,
   decide,
   countByUserId,
   countByManagerId,
   countAll,
   resetToPending,
   findAllForAdmin,
+  countFilteredForAdmin,
   findByIdForAdmin,
   countDecidedTodayByManager,
   mostUsedLeaveType,
+  findApprovedQuotaRequestsForUserYear,
+  findCalendarEventsForManager,
+  findCalendarEventsForAdmin,
 };

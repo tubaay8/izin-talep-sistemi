@@ -5,10 +5,12 @@ const STATUS_LABELS = {
   cancelled: 'Iptal Edildi',
 };
 
+const REPORT_PAGE_SIZE = 20;
+
 const tbody = document.getElementById('report-body');
 const messageEl = document.getElementById('list-message');
 const summaryEl = document.getElementById('report-summary');
-const reportMetaEl = document.getElementById('report-meta');
+const paginationEl = document.getElementById('pagination');
 const filterSearch = document.getElementById('filter-search');
 const filterDepartment = document.getElementById('filter-department');
 const filterStatus = document.getElementById('filter-status');
@@ -19,6 +21,7 @@ const filterClear = document.getElementById('filter-clear');
 
 let currentUser = null;
 let currentRequests = [];
+let currentPage = 1;
 
 function formatDate(value) {
   return new Date(value).toLocaleDateString('tr-TR');
@@ -92,6 +95,31 @@ async function loadFilterOptions() {
   });
 }
 
+function renderTablePage() {
+  tbody.innerHTML = '';
+
+  if (currentRequests.length === 0) {
+    messageEl.textContent = 'Kriterlere uyan izin talebi bulunamadi.';
+    messageEl.className = 'form-message';
+  } else {
+    messageEl.textContent = '';
+    const start = (currentPage - 1) * REPORT_PAGE_SIZE;
+    currentRequests.slice(start, start + REPORT_PAGE_SIZE).forEach((request) => {
+      tbody.appendChild(renderRow(request));
+    });
+  }
+
+  const totalPages = Math.max(1, Math.ceil(currentRequests.length / REPORT_PAGE_SIZE));
+  renderPagination(paginationEl, {
+    page: currentPage,
+    totalPages,
+    onChange: (page) => {
+      currentPage = page;
+      renderTablePage();
+    },
+  });
+}
+
 async function loadReport() {
   try {
     const query = buildFilterQuery();
@@ -100,18 +128,9 @@ async function loadReport() {
 
     const data = await res.json();
     currentRequests = data.requests;
-    tbody.innerHTML = '';
+    currentPage = 1;
     renderSummary(currentRequests);
-
-    if (currentRequests.length === 0) {
-      messageEl.textContent = 'Kriterlere uyan izin talebi bulunamadi.';
-      messageEl.className = 'form-message';
-    } else {
-      messageEl.textContent = '';
-      currentRequests.forEach((request) => {
-        tbody.appendChild(renderRow(request));
-      });
-    }
+    renderTablePage();
   } catch (err) {
     messageEl.textContent = 'Rapor yuklenirken bir hata olustu';
     messageEl.className = 'form-message error';
@@ -174,7 +193,6 @@ async function init() {
   if (meRes.ok) {
     const data = await meRes.json();
     currentUser = data.user;
-    reportMetaEl.textContent = `${currentUser.full_name} - Olusturulma: ${new Date().toLocaleString('tr-TR')}`;
   }
   await loadFilterOptions();
   await loadReport();

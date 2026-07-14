@@ -1,15 +1,5 @@
 const authService = require('../services/auth.service');
 
-async function register(req, res) {
-  try {
-    const { full_name, email, password, department_id, manager_id } = req.body;
-    const userId = await authService.register({ full_name, email, password, department_id, manager_id });
-    res.status(201).json({ message: 'Kayit basarili', userId });
-  } catch (err) {
-    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
-  }
-}
-
 async function login(req, res) {
   try {
     const { email, password } = req.body;
@@ -17,7 +7,11 @@ async function login(req, res) {
 
     req.session.user = user;
 
-    res.json({ message: 'Giris basarili', user, redirectUrl: '/dashboard' });
+    res.json({
+      message: 'Giris basarili',
+      user,
+      redirectUrl: user.must_change_password ? '/change-password' : '/dashboard',
+    });
   } catch (err) {
     res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
   }
@@ -37,4 +31,15 @@ function me(req, res) {
   res.json({ user: req.session.user });
 }
 
-module.exports = { register, login, logout, me };
+async function changePassword(req, res) {
+  try {
+    const { new_password } = req.body;
+    await authService.changePassword(req.session.user.id, new_password);
+    req.session.user.must_change_password = false;
+    res.json({ message: 'Sifre guncellendi', redirectUrl: '/dashboard' });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
+}
+
+module.exports = { login, logout, me, changePassword };

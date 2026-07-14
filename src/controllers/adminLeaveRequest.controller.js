@@ -1,16 +1,25 @@
 const adminLeaveRequestService = require('../services/adminLeaveRequest.service');
 
 async function list(req, res) {
-  const { status, leave_type_id, date_from, date_to, search, department_id } = req.query;
-  const requests = await adminLeaveRequestService.getAllLeaveRequests({
-    status,
-    leave_type_id,
-    date_from,
-    date_to,
-    search,
-    department_id,
-  });
-  res.json({ requests });
+  const { status, leave_type_id, date_from, date_to, search, department_id, page, limit } = req.query;
+  const pagination = page && limit ? { page: Number(page), limit: Number(limit) } : null;
+  const { items, pagination: paginationResult } = await adminLeaveRequestService.getAllLeaveRequests(
+    { status, leave_type_id, date_from, date_to, search, department_id },
+    pagination
+  );
+  const response = { requests: items };
+  if (paginationResult) response.pagination = paginationResult;
+  res.json(response);
+}
+
+async function calendar(req, res) {
+  try {
+    const { start, end, department_id, status } = req.query;
+    const events = await adminLeaveRequestService.getCalendarEvents(start, end, department_id, status);
+    res.json({ events });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
 }
 
 async function getOne(req, res) {
@@ -52,4 +61,4 @@ async function updateStatus(req, res) {
   }
 }
 
-module.exports = { list, getOne, update, updateStatus };
+module.exports = { list, getOne, update, updateStatus, calendar };

@@ -5,8 +5,10 @@ const departmentSelect = document.getElementById('department_id');
 const managerSelect = document.getElementById('manager_id');
 const departmentHint = document.getElementById('department-hint');
 const managerHint = document.getElementById('manager-hint');
+const passwordField = document.getElementById('password-field');
 const passwordInput = document.getElementById('password');
 const passwordLabel = document.getElementById('password-label');
+const passwordHint = document.getElementById('password-hint');
 const activeField = document.getElementById('active-field');
 const formTitle = document.getElementById('form-title');
 const submitBtn = document.getElementById('submit-btn');
@@ -61,9 +63,9 @@ if (isEditMode) {
   submitBtn.innerHTML =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Degisiklikleri Kaydet';
   passwordLabel.textContent = 'Sifre (degistirmek icin doldurun)';
+  passwordField.hidden = false;
+  passwordHint.hidden = true;
   activeField.hidden = false;
-} else {
-  passwordInput.required = true;
 }
 
 async function loadOptions(url, select, labelKey) {
@@ -154,6 +156,10 @@ form.addEventListener('submit', async (event) => {
       messageEl.textContent = detail || 'Islem basarisiz';
       messageEl.classList.add('error');
       return;
+    }
+
+    if (!isEditMode && data.user && data.user.temporaryPassword) {
+      await showTemporaryPasswordDialog(data.user.full_name, data.user.temporaryPassword);
     }
 
     window.location.href = '/admin/users';

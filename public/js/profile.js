@@ -5,25 +5,28 @@ const ICONS = {
   building: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/></svg>',
   plusCircle: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
   calendar: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
+  calendarView: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><circle cx="8" cy="15" r="1"/><circle cx="12" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>',
   barChart: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/><path d="M2 20h20"/></svg>',
 };
 
 const ROLE_SIDEBAR_MENUS = {
   Personel: [
-    ['/dashboard', 'grid', 'Dashboard'],
+    ['/dashboard', 'grid', 'Anasayfa'],
     ['/leave-requests', 'list', 'İzin Taleplerim'],
     ['/leave-requests/new', 'plusCircle', 'Yeni İzin Talebi'],
     ['/leave-requests/report', 'barChart', 'İzin Raporum'],
   ],
   Yonetici: [
-    ['/dashboard', 'grid', 'Dashboard'],
+    ['/dashboard', 'grid', 'Anasayfa'],
     ['/manager/leave-requests', 'list', 'Ekip Talepleri'],
+    ['/manager/calendar', 'calendarView', 'Takvim'],
     ['/manager/reports', 'barChart', 'Ekip İzin Raporu'],
   ],
   Admin: [
-    ['/dashboard', 'grid', 'Dashboard'],
+    ['/dashboard', 'grid', 'Anasayfa'],
     ['/admin/users', 'users', 'Kullanıcı Yönetimi'],
     ['/admin/leave-requests', 'list', 'Tüm İzin Talepleri'],
+    ['/admin/calendar', 'calendarView', 'Takvim'],
     ['/admin/departments', 'building', 'Departman Yönetimi'],
     ['/admin/leave-types', 'calendar', 'İzin Türü Yönetimi'],
     ['/admin/reports', 'barChart', 'Raporlar'],

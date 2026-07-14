@@ -2,6 +2,7 @@ const leaveRequestRepository = require('../repositories/leaveRequest.repository'
 const userRepository = require('../repositories/user.repository');
 const departmentRepository = require('../repositories/department.repository');
 const activityLogService = require('./activityLog.service');
+const leaveBalanceService = require('./leaveBalance.service');
 
 const RECENT_ACTIVITIES_LIMIT = 10;
 
@@ -21,10 +22,11 @@ function normalizeStatusCounts(rows, statuses = ALL_STATUSES) {
 }
 
 async function getPersonnelDashboard(user) {
-  const [statusRows, allRequests, activities] = await Promise.all([
+  const [statusRows, allRequests, activities, leaveBalance] = await Promise.all([
     leaveRequestRepository.countByUserId(user.id),
     leaveRequestRepository.findAllByUserId(user.id),
     activityLogService.getRecentActivities(user, RECENT_ACTIVITIES_LIMIT),
+    leaveBalanceService.getBalanceSummary(user.id),
   ]);
 
   const counts = normalizeStatusCounts(statusRows);
@@ -35,6 +37,7 @@ async function getPersonnelDashboard(user) {
     stats: { total, ...counts },
     recent: allRequests.slice(0, 5),
     activities,
+    leaveBalance,
   };
 }
 

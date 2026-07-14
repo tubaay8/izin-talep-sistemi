@@ -1,8 +1,9 @@
 const userRepository = require('../repositories/user.repository');
 const roleRepository = require('../repositories/role.repository');
 const departmentRepository = require('../repositories/department.repository');
-const { hashPassword } = require('../utils/password');
+const { hashPassword, generateTemporaryPassword } = require('../utils/password');
 const activityLogService = require('./activityLog.service');
+const leaveBalanceService = require('./leaveBalance.service');
 
 const HR_DEPARTMENT_NAME = 'Insan Kaynaklari';
 
@@ -62,8 +63,32 @@ async function resolveDepartmentAndManager(role, submittedDepartmentId, submitte
   return { department_id: department.id, manager_id: validManagerId };
 }
 
-async function getAllUsers(filters) {
-  return userRepository.findAll(filters);
+async function attachLeaveBalances(items) {
+  if (!items.length) return items;
+  const balances = await leaveBalanceService.getBalancesForUsers(items.map((item) => item.id));
+  return items.map((item) => ({ ...item, leave_balance: balances[item.id] }));
+}
+
+async function getAllUsers(filters, pagination) {
+  if (pagination && pagination.limit) {
+    const [rawItems, total] = await Promise.all([
+      userRepository.findAll(filters, pagination),
+      userRepository.countFiltered(filters),
+    ]);
+    const items = await attachLeaveBalances(rawItems);
+    return {
+      items,
+      pagination: {
+        page: pagination.page,
+        limit: pagination.limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / pagination.limit)),
+      },
+    };
+  }
+  const rawItems = await userRepository.findAll(filters);
+  const items = await attachLeaveBalances(rawItems);
+  return { items, pagination: null };
 }
 
 async function getUserById(id) {
@@ -76,7 +101,7 @@ async function getUserById(id) {
   return user;
 }
 
-async function createUser({ full_name, email, password, role_id, department_id, manager_id }, adminId) {
+async function createUser({ full_name, email, role_id, department_id, manager_id }, adminId) {
   const existing = await userRepository.findByEmail(email);
   if (existing) {
     const error = new Error('Bu e-posta adresi zaten kayitli');
@@ -87,7 +112,8 @@ async function createUser({ full_name, email, password, role_id, department_id, 
   const role = await assertRoleExists(role_id);
   const resolved = await resolveDepartmentAndManager(role, department_id, manager_id);
 
-  const passwordHash = await hashPassword(password);
+  const temporaryPassword = generateTemporaryPassword();
+  const passwordHash = await hashPassword(temporaryPassword);
   const userId = await userRepository.create({
     full_name,
     email,
@@ -95,6 +121,7 @@ async function createUser({ full_name, email, password, role_id, department_id, 
     role_id,
     department_id: resolved.department_id,
     manager_id: resolved.manager_id,
+    must_change_password: true,
   });
 
   const created = await userRepository.findByIdDetailed(userId);
@@ -106,7 +133,7 @@ async function createUser({ full_name, email, password, role_id, department_id, 
     targetUserId: userId,
   });
 
-  return created;
+  return { ...created, temporaryPassword };
 }
 
 async function updateUser(id, adminId, { full_name, email, role_id, department_id, manager_id, is_active, password }) {

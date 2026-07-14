@@ -1,0 +1,13 @@
+-- Personelin yil bazinda yillik izin hakki/kullanimini takip eder.
+CREATE TABLE IF NOT EXISTS leave_balances (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  year SMALLINT UNSIGNED NOT NULL,
+  entitled_days SMALLINT UNSIGNED NOT NULL DEFAULT 14,
+  used_days SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT uq_leave_balances_user_year UNIQUE (user_id, year),
+  CONSTRAINT fk_leave_balances_user FOREIGN KEY (user_id)
+    REFERENCES users (id) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;

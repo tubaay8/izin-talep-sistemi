@@ -1,9 +1,15 @@
 const adminUserService = require('../services/adminUser.service');
 
 async function list(req, res) {
-  const { search, role_id, department_id, is_active } = req.query;
-  const users = await adminUserService.getAllUsers({ search, role_id, department_id, is_active });
-  res.json({ users });
+  const { search, role_id, department_id, is_active, page, limit } = req.query;
+  const pagination = page && limit ? { page: Number(page), limit: Number(limit) } : null;
+  const { items, pagination: paginationResult } = await adminUserService.getAllUsers(
+    { search, role_id, department_id, is_active },
+    pagination
+  );
+  const response = { users: items };
+  if (paginationResult) response.pagination = paginationResult;
+  res.json(response);
 }
 
 async function getOne(req, res) {
@@ -17,9 +23,9 @@ async function getOne(req, res) {
 
 async function create(req, res) {
   try {
-    const { full_name, email, password, role_id, department_id, manager_id } = req.body;
+    const { full_name, email, role_id, department_id, manager_id } = req.body;
     const user = await adminUserService.createUser(
-      { full_name, email, password, role_id, department_id, manager_id },
+      { full_name, email, role_id, department_id, manager_id },
       req.session.user.id
     );
     res.status(201).json({ message: 'Kullanici olusturuldu', user });

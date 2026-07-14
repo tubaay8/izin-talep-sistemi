@@ -32,13 +32,36 @@ async function log({ actorId, actionType, description, targetUserId }) {
 }
 
 async function getRecentActivities(user, limit = DEFAULT_LIMIT) {
-  if (user.role_name === 'Admin') {
-    return activityLogRepository.findRecentGlobal(limit);
-  }
-  if (user.role_name === 'Yonetici') {
-    return activityLogRepository.findRecentForManager(user.id, limit);
-  }
-  return activityLogRepository.findRecentForUser(user.id, limit);
+  const { items } = await getPaginatedActivities(user, 1, limit);
+  return items;
 }
 
-module.exports = { log, getRecentActivities, ACTION_TYPES };
+async function getPaginatedActivities(user, page = 1, limit = DEFAULT_LIMIT) {
+  const pagination = { page, limit };
+  let items;
+  let total;
+
+  if (user.role_name === 'Admin') {
+    [items, total] = await Promise.all([
+      activityLogRepository.findRecentGlobal(pagination),
+      activityLogRepository.countGlobal(),
+    ]);
+  } else if (user.role_name === 'Yonetici') {
+    [items, total] = await Promise.all([
+      activityLogRepository.findRecentForManager(user.id, pagination),
+      activityLogRepository.countForManager(user.id),
+    ]);
+  } else {
+    [items, total] = await Promise.all([
+      activityLogRepository.findRecentForUser(user.id, pagination),
+      activityLogRepository.countForUser(user.id),
+    ]);
+  }
+
+  return {
+    items,
+    pagination: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) },
+  };
+}
+
+module.exports = { log, getRecentActivities, getPaginatedActivities, ACTION_TYPES };

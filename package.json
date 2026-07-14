@@ -14,6 +14,9 @@
   "license": "ISC",
   "description": "Izin Talep Sistemi - staj projesi",
   "dependencies": {
+    "@fullcalendar/core": "^6.1.21",
+    "@fullcalendar/daygrid": "^6.1.21",
+    "@fullcalendar/timegrid": "^6.1.21",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

@@ -5,6 +5,8 @@ const STATUS_LABELS = {
   cancelled: 'Iptal Edildi',
 };
 
+const PAGE_SIZE = 20;
+
 const tbody = document.getElementById('requests-body');
 const messageEl = document.getElementById('list-message');
 const filterSearch = document.getElementById('filter-search');
@@ -13,6 +15,9 @@ const filterLeaveType = document.getElementById('filter-leave-type');
 const filterDateFrom = document.getElementById('filter-date-from');
 const filterDateTo = document.getElementById('filter-date-to');
 const filterClear = document.getElementById('filter-clear');
+const paginationEl = document.getElementById('pagination');
+
+let currentPage = 1;
 
 async function loadLeaveTypeOptions() {
   const res = await fetch('/api/leave-types');
@@ -32,6 +37,8 @@ function buildFilterQuery() {
   if (filterLeaveType.value) params.set('leave_type_id', filterLeaveType.value);
   if (filterDateFrom.value) params.set('date_from', filterDateFrom.value);
   if (filterDateTo.value) params.set('date_to', filterDateTo.value);
+  params.set('page', currentPage);
+  params.set('limit', PAGE_SIZE);
   return params.toString();
 }
 
@@ -68,6 +75,7 @@ function renderRow(request) {
     <td>${request.reason || '-'}</td>
     <td><span class="status-badge status-${request.status}">${STATUS_LABELS[request.status]}</span></td>
     <td>${request.report_file ? `<a href="/api/leave-requests/${request.id}/report" target="_blank" class="report-badge">Raporu Görüntüle</a>` : '-'}</td>
+    <td>${request.leave_balance ? `${request.leave_balance.remainingDays}/${request.leave_balance.entitledDays}` : '-'}</td>
     <td>${actions.length ? `<div class="quick-actions">${actions.join('')}</div>` : '-'}</td>
   `;
   return tr;
@@ -89,24 +97,39 @@ async function loadRequests() {
     if (data.requests.length === 0) {
       messageEl.textContent = 'Kriterlere uyan izin talebi bulunamadi.';
       messageEl.className = 'form-message';
-      return;
+    } else {
+      messageEl.textContent = '';
+      data.requests.forEach((request) => {
+        tbody.appendChild(renderRow(request));
+      });
     }
 
-    messageEl.textContent = '';
-    data.requests.forEach((request) => {
-      tbody.appendChild(renderRow(request));
-    });
+    if (data.pagination) {
+      renderPagination(paginationEl, {
+        page: data.pagination.page,
+        totalPages: data.pagination.totalPages,
+        onChange: (page) => {
+          currentPage = page;
+          loadRequests();
+        },
+      });
+    }
   } catch (err) {
     messageEl.textContent = 'Talepler yuklenirken bir hata olustu';
     messageEl.className = 'form-message error';
   }
 }
 
-const debouncedLoadRequests = debounce(loadRequests, 300);
+function loadRequestsFromStart() {
+  currentPage = 1;
+  loadRequests();
+}
+
+const debouncedLoadRequests = debounce(loadRequestsFromStart, 300);
 
 filterSearch.addEventListener('input', debouncedLoadRequests);
 [filterStatus, filterLeaveType, filterDateFrom, filterDateTo].forEach((field) => {
-  field.addEventListener('change', loadRequests);
+  field.addEventListener('change', loadRequestsFromStart);
 });
 
 filterClear.addEventListener('click', () => {
@@ -115,7 +138,7 @@ filterClear.addEventListener('click', () => {
   filterLeaveType.value = '';
   filterDateFrom.value = '';
   filterDateTo.value = '';
-  loadRequests();
+  loadRequestsFromStart();
 });
 
 tbody.addEventListener('click', async (event) => {

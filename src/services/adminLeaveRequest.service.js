@@ -1,6 +1,9 @@
 const leaveRequestRepository = require('../repositories/leaveRequest.repository');
+const leaveTypeRepository = require('../repositories/leaveType.repository');
 const { assertValidDateRange, assertLeaveTypeExists, assertReportProvided } = require('../utils/leaveRequestValidators');
 const activityLogService = require('./activityLog.service');
+const leaveBalanceService = require('./leaveBalance.service');
+const { toCalendarEvents } = require('../utils/calendarEvent');
 
 const VALID_STATUSES = ['pending', 'approved', 'rejected', 'cancelled'];
 
@@ -18,8 +21,24 @@ const STATUS_DESCRIPTIONS = {
   pending: 'tekrar beklemeye alindi',
 };
 
-async function getAllLeaveRequests(filters) {
-  return leaveRequestRepository.findAllForAdmin(filters);
+async function getAllLeaveRequests(filters, pagination) {
+  if (pagination && pagination.limit) {
+    const [items, total] = await Promise.all([
+      leaveRequestRepository.findAllForAdmin(filters, pagination),
+      leaveRequestRepository.countFilteredForAdmin(filters),
+    ]);
+    return {
+      items,
+      pagination: {
+        page: pagination.page,
+        limit: pagination.limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / pagination.limit)),
+      },
+    };
+  }
+  const items = await leaveRequestRepository.findAllForAdmin(filters);
+  return { items, pagination: null };
 }
 
 async function getLeaveRequestById(id) {
@@ -39,6 +58,28 @@ async function updateLeaveRequest(id, { leave_type_id, start_date, end_date, rea
 
   const effectiveReportFile = report_file !== undefined ? report_file : existing.report_file;
   assertReportProvided(leaveType, effectiveReportFile);
+
+  // Onaylanmis bir talebin tarihi/turu degisiyorsa, bakiyeyi eski degerle
+  // serbest birakip yeni degerle tekrar dusmemiz gerekir (aksi halde bakiye sapar).
+  if (existing.status === 'approved') {
+    const oldLeaveType = await leaveTypeRepository.findById(existing.leave_type_id);
+    await leaveBalanceService.adjustBalanceForStatusChange({
+      userId: existing.user_id,
+      leaveType: oldLeaveType,
+      startDate: existing.start_date,
+      endDate: existing.end_date,
+      oldStatus: 'approved',
+      newStatus: 'rejected',
+    });
+    await leaveBalanceService.adjustBalanceForStatusChange({
+      userId: existing.user_id,
+      leaveType,
+      startDate: start_date,
+      endDate: end_date,
+      oldStatus: 'rejected',
+      newStatus: 'approved',
+    });
+  }
 
   await leaveRequestRepository.update(id, { leave_type_id, start_date, end_date, reason, report_file });
   return leaveRequestRepository.findById(id);
@@ -63,6 +104,16 @@ async function updateStatus(id, adminId, { status, approval_note }) {
 
   const updated = await leaveRequestRepository.findById(id);
 
+  const leaveType = await leaveTypeRepository.findById(request.leave_type_id);
+  await leaveBalanceService.adjustBalanceForStatusChange({
+    userId: request.user_id,
+    leaveType,
+    startDate: request.start_date,
+    endDate: request.end_date,
+    oldStatus: request.status,
+    newStatus: status,
+  });
+
   await activityLogService.log({
     actorId: adminId,
     actionType: STATUS_ACTION_TYPES[status],
@@ -73,4 +124,9 @@ async function updateStatus(id, adminId, { status, approval_note }) {
   return updated;
 }
 
-module.exports = { getAllLeaveRequests, getLeaveRequestById, updateLeaveRequest, updateStatus };
+async function getCalendarEvents(startDate, endDate, departmentId, status) {
+  const requests = await leaveRequestRepository.findCalendarEventsForAdmin(startDate, endDate, departmentId, status);
+  return toCalendarEvents(requests);
+}
+
+module.exports = { getAllLeaveRequests, getLeaveRequestById, updateLeaveRequest, updateStatus, getCalendarEvents };

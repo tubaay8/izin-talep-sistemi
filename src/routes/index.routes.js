@@ -14,8 +14,8 @@ router.get('/login', requireGuest, (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'auth.html'));
 });
 
-router.get('/register', requireGuest, (req, res) => {
-  res.sendFile(path.join(PUBLIC_DIR, 'auth.html'));
+router.get('/change-password', requireAuth, (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'change-password.html'));
 });
 
 router.get('/dashboard', requireAuth, (req, res) => {
@@ -50,6 +50,10 @@ router.get('/manager/reports', requireAuth, (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'manager-report.html'));
 });
 
+router.get('/manager/calendar', requireAuth, (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'manager-calendar.html'));
+});
+
 router.get('/admin/users', requireAuth, (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'admin-users.html'));
 });
@@ -80,6 +84,10 @@ router.get('/admin/leave-types', requireAuth, (req, res) => {
 
 router.get('/admin/reports', requireAuth, (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'admin-report.html'));
+});
+
+router.get('/admin/calendar', requireAuth, (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'admin-calendar.html'));
 });
 
 router.get('/api/status', homeController.getStatus);

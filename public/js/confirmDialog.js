@@ -62,6 +62,18 @@ function confirmCancelRequest() {
   });
 }
 
+function showTemporaryPasswordDialog(fullName, password) {
+  return Swal.fire({
+    title: 'Kullanici Olusturuldu',
+    html: `<p>${fullName} icin gecici bir sifre olusturuldu. Bu sifreyi kullaniciya iletin, ilk giriste degistirmesi istenecek.</p>
+           <p style="font-size:1.3rem;font-weight:700;letter-spacing:0.05em;margin-top:0.75rem;">${password}</p>`,
+    icon: 'success',
+    confirmButtonText: 'Anladim',
+    confirmButtonColor: DIALOG_COLORS.neutral,
+    allowOutsideClick: false,
+  });
+}
+
 function showErrorDialog(message) {
   return Swal.fire({
     title: 'Islem Basarisiz',

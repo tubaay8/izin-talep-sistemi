@@ -1,3 +1,5 @@
+const PAGE_SIZE = 20;
+
 const tbody = document.getElementById('users-body');
 const messageEl = document.getElementById('list-message');
 const filterSearch = document.getElementById('filter-search');
@@ -5,6 +7,9 @@ const filterRole = document.getElementById('filter-role');
 const filterDepartment = document.getElementById('filter-department');
 const filterActive = document.getElementById('filter-active');
 const filterClear = document.getElementById('filter-clear');
+const paginationEl = document.getElementById('pagination');
+
+let currentPage = 1;
 
 async function loadFilterOptions() {
   const [rolesRes, departmentsRes] = await Promise.all([fetch('/api/roles'), fetch('/api/departments')]);
@@ -32,6 +37,8 @@ function buildFilterQuery() {
   if (filterRole.value) params.set('role_id', filterRole.value);
   if (filterDepartment.value) params.set('department_id', filterDepartment.value);
   if (filterActive.value) params.set('is_active', filterActive.value);
+  params.set('page', currentPage);
+  params.set('limit', PAGE_SIZE);
   return params.toString();
 }
 
@@ -61,6 +68,7 @@ function renderRow(user) {
     <td>${user.department_name}</td>
     <td>${user.manager_name || '-'}</td>
     <td><span class="status-badge ${user.is_active ? 'status-approved' : 'status-rejected'}">${user.is_active ? 'Aktif' : 'Pasif'}</span></td>
+    <td>${user.leave_balance ? `${user.leave_balance.remainingDays}/${user.leave_balance.entitledDays}` : '-'}</td>
     <td><a href="/admin/users/edit?id=${user.id}" class="btn-edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>Duzenle</a></td>
   `;
   return tr;
@@ -82,24 +90,39 @@ async function loadUsers() {
     if (data.users.length === 0) {
       messageEl.textContent = 'Kriterlere uyan kullanici bulunamadi.';
       messageEl.className = 'form-message';
-      return;
+    } else {
+      messageEl.textContent = '';
+      sortUsers(data.users).forEach((user) => {
+        tbody.appendChild(renderRow(user));
+      });
     }
 
-    messageEl.textContent = '';
-    sortUsers(data.users).forEach((user) => {
-      tbody.appendChild(renderRow(user));
-    });
+    if (data.pagination) {
+      renderPagination(paginationEl, {
+        page: data.pagination.page,
+        totalPages: data.pagination.totalPages,
+        onChange: (page) => {
+          currentPage = page;
+          loadUsers();
+        },
+      });
+    }
   } catch (err) {
     messageEl.textContent = 'Kullanicilar yuklenirken bir hata olustu';
     messageEl.className = 'form-message error';
   }
 }
 
-const debouncedLoadUsers = debounce(loadUsers, 300);
+function loadUsersFromStart() {
+  currentPage = 1;
+  loadUsers();
+}
+
+const debouncedLoadUsers = debounce(loadUsersFromStart, 300);
 
 filterSearch.addEventListener('input', debouncedLoadUsers);
 [filterRole, filterDepartment, filterActive].forEach((field) => {
-  field.addEventListener('change', loadUsers);
+  field.addEventListener('change', loadUsersFromStart);
 });
 
 filterClear.addEventListener('click', () => {
@@ -107,7 +130,7 @@ filterClear.addEventListener('click', () => {
   filterRole.value = '';
   filterDepartment.value = '';
   filterActive.value = '';
-  loadUsers();
+  loadUsersFromStart();
 });
 
 loadFilterOptions().then(loadUsers);
