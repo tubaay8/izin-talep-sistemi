@@ -17,6 +17,7 @@ const ICONS = {
   calendarView: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><circle cx="8" cy="15" r="1"/><circle cx="12" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>',
   barChart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/><path d="M2 20h20"/></svg>',
   edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>',
+  lineChart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>',
 };
 
 const ACTIVITY_STYLE = {
@@ -383,6 +384,7 @@ function renderManagerDashboard(user, data) {
     sidebarLink('/manager/leave-requests', 'list', 'Ekip Talepleri', false),
     sidebarLink('/manager/calendar', 'calendarView', 'Takvim', false),
     sidebarLink('/manager/reports', 'barChart', 'Ekip Izin Raporu', false),
+    sidebarLink('/manager/statistics', 'lineChart', 'Istatistikler', false),
   ].join('');
 }
 

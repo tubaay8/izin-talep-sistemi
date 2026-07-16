@@ -1,6 +1,6 @@
 const express = require('express');
 const adminLeaveRequestController = require('../controllers/adminLeaveRequest.controller');
-const { updateValidation, statusValidation } = require('../validations/adminLeaveRequest.validation');
+const { updateValidation, statusValidation, bulkStatusValidation } = require('../validations/adminLeaveRequest.validation');
 const validate = require('../middlewares/validate.middleware');
 const { reportUpload, handleUploadError } = require('../middlewares/reportUpload.middleware');
 
@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.get('/', adminLeaveRequestController.list);
 router.get('/calendar', adminLeaveRequestController.calendar);
+router.post('/bulk-status', bulkStatusValidation, validate, adminLeaveRequestController.bulkUpdateStatus);
 router.get('/:id', adminLeaveRequestController.getOne);
 router.put(
   '/:id',

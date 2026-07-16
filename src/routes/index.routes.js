@@ -54,6 +54,10 @@ router.get('/manager/calendar', requireAuth, (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'manager-calendar.html'));
 });
 
+router.get('/manager/statistics', requireAuth, (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'manager-statistics.html'));
+});
+
 router.get('/admin/users', requireAuth, (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'admin-users.html'));
 });

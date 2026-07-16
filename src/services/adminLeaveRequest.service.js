@@ -129,4 +129,35 @@ async function getCalendarEvents(startDate, endDate, departmentId, status) {
   return toCalendarEvents(requests);
 }
 
-module.exports = { getAllLeaveRequests, getLeaveRequestById, updateLeaveRequest, updateStatus, getCalendarEvents };
+async function bulkUpdateStatus(ids, adminId, { status, approval_note }) {
+  if (status === 'rejected' && !approval_note) {
+    const error = new Error('Toplu red icin bir gerekce yazmalisiniz');
+    error.status = 400;
+    throw error;
+  }
+
+  const uniqueIds = [...new Set(ids.map((id) => Number(id)))];
+  const updatedIds = [];
+  const skippedIds = [];
+
+  for (const id of uniqueIds) {
+    const request = await leaveRequestRepository.findByIdForAdmin(id);
+    if (!request || request.status !== 'pending') {
+      skippedIds.push(id);
+      continue;
+    }
+    await updateStatus(id, adminId, { status, approval_note });
+    updatedIds.push(id);
+  }
+
+  return { updatedCount: updatedIds.length, skippedCount: skippedIds.length, updatedIds, skippedIds };
+}
+
+module.exports = {
+  getAllLeaveRequests,
+  getLeaveRequestById,
+  updateLeaveRequest,
+  updateStatus,
+  bulkUpdateStatus,
+  getCalendarEvents,
+};

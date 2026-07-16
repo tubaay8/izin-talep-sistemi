@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tum Izin Talepleri - Izin Talep Sistemi</title>
-  <link rel="stylesheet" href="/css/style.css?v=22" />
-  <link rel="stylesheet" href="/css/dark-theme.css?v=12" />
+  <link rel="stylesheet" href="/css/style.css?v=24" />
+  <link rel="stylesheet" href="/css/dark-theme.css?v=14" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#8C6E63" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
@@ -118,10 +118,40 @@
 
     <p id="list-message" class="form-message"></p>
 
+    <div class="bulk-action-bar" id="bulk-action-bar" hidden>
+      <div class="bulk-action-info">
+        <span class="bulk-action-count"><strong id="bulk-selected-count">0</strong> kayıt seçildi</span>
+        <span class="bulk-action-stats">
+          <span>Toplam izin günü: <strong id="bulk-total-days">0</strong></span>
+          <span>Seçilen personel: <strong id="bulk-total-people">0</strong></span>
+        </span>
+      </div>
+      <div class="bulk-action-buttons">
+        <button type="button" id="bulk-approve-btn" class="btn-bulk btn-bulk-approve">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          Toplu Onayla
+        </button>
+        <button type="button" id="bulk-reject-btn" class="btn-bulk btn-bulk-reject">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          Toplu Reddet
+        </button>
+        <button type="button" id="bulk-pdf-btn" class="btn-bulk btn-bulk-outline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M12 10v6M9.5 13.5L12 16l2.5-2.5"/></svg>
+          PDF Indir
+        </button>
+        <button type="button" id="bulk-csv-btn" class="btn-bulk btn-bulk-outline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M12 10v6M9.5 13.5L12 16l2.5-2.5"/></svg>
+          Excel'e Aktar
+        </button>
+        <button type="button" id="bulk-clear-btn" class="btn-bulk btn-bulk-ghost">Seçimi Temizle</button>
+      </div>
+    </div>
+
     <div class="table-scroll">
       <table class="data-table" id="requests-table">
         <thead>
           <tr>
+            <th class="col-checkbox"><input type="checkbox" id="select-all-checkbox" title="Tumunu sec" /></th>
             <th>Personel</th>
             <th>Departman</th>
             <th>Yonetici</th>
@@ -140,9 +170,12 @@
   </main>
   <script src="/js/themeToggle.js"></script>
   <script src="/vendor/sweetalert2.all.min.js"></script>
+  <script src="/vendor/jspdf.umd.min.js"></script>
+  <script src="/vendor/jspdf.plugin.autotable.min.js"></script>
+  <script src="/js/reportExport.js"></script>
   <script src="/js/confirmDialog.js"></script>
   <script src="/js/pagination.js"></script>
-  <script src="/js/admin-leave-requests.js?v=4"></script>
+  <script src="/js/admin-leave-requests.js?v=6"></script>
   <script src="/js/adminSidebar.js"></script>
   <script src="/js/sidebarProfileLink.js"></script>
   <script src="/js/sw-register.js"></script>

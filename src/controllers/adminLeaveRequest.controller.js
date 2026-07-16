@@ -61,4 +61,14 @@ async function updateStatus(req, res) {
   }
 }
 
-module.exports = { list, getOne, update, updateStatus, calendar };
+async function bulkUpdateStatus(req, res) {
+  try {
+    const { ids, status, approval_note } = req.body;
+    const result = await adminLeaveRequestService.bulkUpdateStatus(ids, req.session.user.id, { status, approval_note });
+    res.json({ message: 'Toplu islem tamamlandi', ...result });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
+}
+
+module.exports = { list, getOne, update, updateStatus, bulkUpdateStatus, calendar };

@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ekip Takvimi - Izin Talep Sistemi</title>
-  <link rel="stylesheet" href="/css/style.css?v=22" />
-  <link rel="stylesheet" href="/css/dark-theme.css?v=12" />
+  <link rel="stylesheet" href="/css/style.css?v=24" />
+  <link rel="stylesheet" href="/css/dark-theme.css?v=14" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#8C6E63" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
@@ -34,6 +34,10 @@
       <a href="/manager/reports" class="sidebar-link">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/><path d="M2 20h20"/></svg>
         <span class="sidebar-label">Ekip İzin Raporu</span>
+      </a>
+      <a href="/manager/statistics" class="sidebar-link">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+        <span class="sidebar-label">İstatistikler</span>
       </a>
     </nav>
     <button type="button" class="sidebar-logout" id="sidebar-logout-btn">
@@ -145,6 +149,7 @@
   <script src="/vendor/jspdf.umd.min.js"></script>
   <script src="/vendor/jspdf.plugin.autotable.min.js"></script>
   <script src="/js/reportExport.js"></script>
+  <script src="/js/leaveTypeColors.js"></script>
   <script src="/js/leaveCalendar.js"></script>
   <script src="/js/manager-calendar.js"></script>
   <script src="/js/adminSidebar.js"></script>

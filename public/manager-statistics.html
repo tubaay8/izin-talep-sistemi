@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ekip Talepleri - Izin Talep Sistemi</title>
+  <title>Ekip Istatistikleri - Izin Talep Sistemi</title>
   <link rel="stylesheet" href="/css/style.css?v=24" />
   <link rel="stylesheet" href="/css/dark-theme.css?v=14" />
   <link rel="manifest" href="/manifest.json" />
@@ -23,7 +23,7 @@
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         <span class="sidebar-label">Anasayfa</span>
       </a>
-      <a href="/manager/leave-requests" class="sidebar-link active">
+      <a href="/manager/leave-requests" class="sidebar-link">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
         <span class="sidebar-label">Ekip Talepleri</span>
       </a>
@@ -35,7 +35,7 @@
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/><path d="M2 20h20"/></svg>
         <span class="sidebar-label">Ekip İzin Raporu</span>
       </a>
-      <a href="/manager/statistics" class="sidebar-link">
+      <a href="/manager/statistics" class="sidebar-link active">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
         <span class="sidebar-label">İstatistikler</span>
       </a>
@@ -63,72 +63,101 @@
   </header>
 
   <main class="page-card">
-    <div class="page-header">
-      <h1><span class="brand-logo">İT</span> Ekip Talepleri</h1>
+    <div class="page-header stats-page-header">
+      <h1><span class="brand-logo">İT</span> Ekip İstatistikleri</h1>
+      <div class="stats-header-controls">
+        <div class="stats-date-range">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+          <input type="date" id="stats-date-from" />
+          <span>-</span>
+          <input type="date" id="stats-date-to" />
+        </div>
+        <button type="button" id="stats-download-btn" class="btn-outline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z"/><path d="M12 10v6M9.5 13.5L12 16l2.5-2.5"/></svg>
+          Raporu Indir
+        </button>
+      </div>
     </div>
 
-    <div class="filter-bar">
-      <div class="filter-field">
-        <label for="filter-search">Personel Ara</label>
-        <input type="text" id="filter-search" placeholder="Isim..." />
+    <section class="stats-grid" id="stats-cards"></section>
+
+    <div class="stats-charts-grid">
+      <div class="stats-panel">
+        <h2>Personel Bazlı İzin Kullanımı</h2>
+        <p class="stats-panel-subtitle">Toplam kullanılan izin günü</p>
+        <div class="stats-chart-wrap">
+          <canvas id="chart-employee-usage"></canvas>
+        </div>
       </div>
-      <div class="filter-field">
-        <label for="filter-status">Durum</label>
-        <select id="filter-status">
-          <option value="">Tümü</option>
-          <option value="pending">Bekliyor</option>
-          <option value="approved">Onaylandı</option>
-          <option value="rejected">Reddedildi</option>
-          <option value="cancelled">İptal Edildi</option>
-        </select>
+      <div class="stats-panel">
+        <h2>İzin Türlerine Göre Dağılım</h2>
+        <p class="stats-panel-subtitle">Talep sayısına göre oran</p>
+        <div class="stats-donut-row">
+          <div class="stats-donut-wrap">
+            <canvas id="chart-leave-type"></canvas>
+            <div class="stats-donut-center">
+              <span class="stats-donut-total-label">Toplam</span>
+              <strong id="stats-donut-total-value">0</strong>
+            </div>
+          </div>
+          <ul class="stats-donut-legend" id="stats-donut-legend"></ul>
+        </div>
       </div>
-      <div class="filter-field">
-        <label for="filter-leave-type">Izin Turu</label>
-        <select id="filter-leave-type">
-          <option value="">Tumu</option>
-        </select>
-      </div>
-      <div class="filter-field">
-        <label for="filter-date-from">Baslangic (sonrasi)</label>
-        <input type="date" id="filter-date-from" />
-      </div>
-      <div class="filter-field">
-        <label for="filter-date-to">Bitis (oncesi)</label>
-        <input type="date" id="filter-date-to" />
-      </div>
-      <button type="button" id="filter-clear" class="filter-clear">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 3v6h-6"/></svg>
-        Filtreleri Temizle
-      </button>
     </div>
 
-    <p id="list-message" class="form-message"></p>
-
-    <div class="table-scroll">
-      <table class="data-table" id="requests-table">
-        <thead>
-          <tr>
-            <th>Personel</th>
-            <th>Izin Turu</th>
-            <th>Baslangic</th>
-            <th>Bitis</th>
-            <th>Aciklama</th>
-            <th>Durum</th>
-            <th>Rapor</th>
-            <th>Izin Bakiyesi</th>
-            <th>Islemler</th>
-          </tr>
-        </thead>
-        <tbody id="requests-body"></tbody>
-      </table>
+    <div class="stats-charts-grid">
+      <div class="stats-panel">
+        <h2>Aylık İzin Yoğunluğu</h2>
+        <p class="stats-panel-subtitle">Günlere göre toplam izinli kişi sayısı</p>
+        <div class="stats-chart-wrap">
+          <canvas id="chart-daily-intensity"></canvas>
+        </div>
+      </div>
+      <div class="stats-panel">
+        <h2>En Çok Kullanılan İzin Türleri</h2>
+        <p class="stats-panel-subtitle">Top 5</p>
+        <table class="data-table stats-mini-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>İzin Türü</th>
+              <th>Kişi Sayısı</th>
+              <th>Toplam Gün</th>
+            </tr>
+          </thead>
+          <tbody id="top-leave-types-body"></tbody>
+        </table>
+      </div>
     </div>
-    <div class="pagination" id="pagination"></div>
+
+    <div class="stats-panel">
+      <h2>Sık İzin Kullanan Personeller</h2>
+      <p class="stats-panel-subtitle">Bu dönemde en çok izin kullanan personel</p>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Personel</th>
+              <th>Departman</th>
+              <th>Toplam İzin Günü</th>
+              <th>Kullanılan İzin Türü</th>
+              <th>Talep Sayısı</th>
+            </tr>
+          </thead>
+          <tbody id="top-employees-body"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="top-employees-pagination"></div>
+    </div>
   </main>
   <script src="/js/themeToggle.js"></script>
-  <script src="/vendor/sweetalert2.all.min.js"></script>
-  <script src="/js/confirmDialog.js"></script>
+  <script src="/vendor/chart.umd.js"></script>
+  <script src="/vendor/jspdf.umd.min.js"></script>
+  <script src="/vendor/jspdf.plugin.autotable.min.js"></script>
+  <script src="/js/reportExport.js"></script>
   <script src="/js/pagination.js"></script>
-  <script src="/js/manager-requests.js?v=5"></script>
+  <script src="/js/leaveTypeColors.js"></script>
+  <script src="/js/manager-statistics.js"></script>
   <script src="/js/adminSidebar.js"></script>
   <script src="/js/sidebarProfileLink.js"></script>
   <script src="/js/sw-register.js"></script>

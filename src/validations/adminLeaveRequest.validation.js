@@ -12,4 +12,11 @@ const statusValidation = [
   body('approval_note').optional({ checkFalsy: true }).isLength({ max: 500 }).withMessage('Aciklama en fazla 500 karakter olabilir'),
 ];
 
-module.exports = { updateValidation, statusValidation };
+const bulkStatusValidation = [
+  body('ids').isArray({ min: 1 }).withMessage('En az bir izin talebi seciniz'),
+  body('ids.*').isInt({ min: 1 }).withMessage('Gecersiz izin talebi'),
+  body('status').isIn(['approved', 'rejected']).withMessage('Gecersiz durum'),
+  body('approval_note').optional({ checkFalsy: true }).isLength({ max: 500 }).withMessage('Aciklama en fazla 500 karakter olabilir'),
+];
+
+module.exports = { updateValidation, statusValidation, bulkStatusValidation };

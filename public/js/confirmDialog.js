@@ -93,3 +93,49 @@ function confirmStatusChange(label) {
     confirmColor: DIALOG_COLORS.neutral,
   });
 }
+
+function confirmBulkApprove(count) {
+  return confirmDialog({
+    title: 'Toplu Onay',
+    text: `Secilen ${count} izin talebini onaylamak istediginize emin misiniz? Bu islem geri alinamaz.`,
+    icon: 'question',
+    confirmText: 'Onayla',
+    confirmColor: DIALOG_COLORS.approve,
+  });
+}
+
+async function confirmBulkReject(count) {
+  const result = await Swal.fire({
+    title: 'Toplu Red',
+    html: `Secilen <strong>${count}</strong> izin talebi reddedilecek.`,
+    icon: 'warning',
+    input: 'textarea',
+    inputLabel: 'Red Sebebi',
+    inputPlaceholder: 'Red gerekcesini yaziniz...',
+    inputValidator: (value) => (!value || !value.trim() ? 'Red sebebi zorunludur' : undefined),
+    showCancelButton: true,
+    confirmButtonText: 'Reddet',
+    cancelButtonText: 'Iptal',
+    confirmButtonColor: DIALOG_COLORS.reject,
+    cancelButtonColor: '#8C8C8C',
+    reverseButtons: true,
+    focusCancel: true,
+  });
+
+  if (!result.isConfirmed) {
+    return null;
+  }
+  return { note: result.value.trim() };
+}
+
+function showActionToast(message, icon = 'success') {
+  Swal.fire({
+    toast: true,
+    position: 'top-end',
+    icon,
+    title: message,
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+  });
+}

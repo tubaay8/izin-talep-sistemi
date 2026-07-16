@@ -7,6 +7,7 @@ const ICONS = {
   calendar: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
   calendarView: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><circle cx="8" cy="15" r="1"/><circle cx="12" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg>',
   barChart: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/><path d="M2 20h20"/></svg>',
+  lineChart: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>',
 };
 
 const ROLE_SIDEBAR_MENUS = {
@@ -21,6 +22,7 @@ const ROLE_SIDEBAR_MENUS = {
     ['/manager/leave-requests', 'list', 'Ekip Talepleri'],
     ['/manager/calendar', 'calendarView', 'Takvim'],
     ['/manager/reports', 'barChart', 'Ekip İzin Raporu'],
+    ['/manager/statistics', 'lineChart', 'İstatistikler'],
   ],
   Admin: [
     ['/dashboard', 'grid', 'Anasayfa'],

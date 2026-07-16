@@ -360,6 +360,37 @@ html[data-theme="dark"] .status-select {
   color: var(--heading);
 }
 
+html[data-theme="dark"] .bulk-action-bar {
+  background: linear-gradient(135deg, rgba(211, 163, 118, 0.16), rgba(211, 163, 118, 0.08));
+  border-color: rgba(211, 163, 118, 0.4);
+}
+
+html[data-theme="dark"] .bulk-action-info {
+  color: var(--heading);
+}
+
+html[data-theme="dark"] .bulk-action-stats {
+  color: var(--text-secondary);
+}
+
+html[data-theme="dark"] .btn-bulk-outline {
+  background: var(--surface-2);
+  border-color: rgba(211, 163, 118, 0.4);
+  color: var(--text-primary);
+}
+
+html[data-theme="dark"] .btn-bulk-outline:hover {
+  background: rgba(211, 163, 118, 0.2);
+}
+
+html[data-theme="dark"] .btn-bulk-ghost {
+  color: var(--text-secondary);
+}
+
+html[data-theme="dark"] .btn-bulk-ghost:hover {
+  color: var(--heading);
+}
+
 /* Dashboard bilesenleri */
 
 html[data-theme="dark"] .role-banner {
@@ -679,4 +710,50 @@ html[data-theme="dark"] .today-leave-info span {
 
 html[data-theme="dark"] .today-leave-section h2 {
   color: var(--heading);
+}
+
+/* Ekip istatistikleri */
+
+html[data-theme="dark"] .stats-panel {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+html[data-theme="dark"] .stats-panel h2 {
+  color: var(--heading);
+}
+
+html[data-theme="dark"] .stats-panel-subtitle {
+  color: var(--text-secondary);
+}
+
+html[data-theme="dark"] .stats-date-range {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+html[data-theme="dark"] .stats-date-range input[type='date'] {
+  color: var(--text-primary);
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] .stats-donut-total-label {
+  color: var(--text-secondary);
+}
+
+html[data-theme="dark"] .stats-donut-center strong {
+  color: var(--heading);
+}
+
+html[data-theme="dark"] .stats-donut-legend-name {
+  color: var(--text-primary);
+}
+
+html[data-theme="dark"] .stats-donut-legend-value {
+  color: var(--text-secondary);
+}
+
+html[data-theme="dark"] .stat-sub {
+  color: var(--text-secondary);
 }
