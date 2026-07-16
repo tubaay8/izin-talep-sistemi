@@ -46,10 +46,6 @@ router.get('/manager/leave-requests', requireAuth, (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'manager-requests.html'));
 });
 
-router.get('/manager/reports', requireAuth, (req, res) => {
-  res.sendFile(path.join(PUBLIC_DIR, 'manager-report.html'));
-});
-
 router.get('/manager/calendar', requireAuth, (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'manager-calendar.html'));
 });

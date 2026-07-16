@@ -16,8 +16,20 @@ const filterDateFrom = document.getElementById('filter-date-from');
 const filterDateTo = document.getElementById('filter-date-to');
 const filterClear = document.getElementById('filter-clear');
 const paginationEl = document.getElementById('pagination');
+const selectAllCheckbox = document.getElementById('select-all-checkbox');
+const bulkActionBar = document.getElementById('bulk-action-bar');
+const bulkSelectedCountEl = document.getElementById('bulk-selected-count');
+const bulkTotalDaysEl = document.getElementById('bulk-total-days');
+const bulkTotalPeopleEl = document.getElementById('bulk-total-people');
+const bulkApproveBtn = document.getElementById('bulk-approve-btn');
+const bulkRejectBtn = document.getElementById('bulk-reject-btn');
+const bulkPdfBtn = document.getElementById('bulk-pdf-btn');
+const bulkCsvBtn = document.getElementById('bulk-csv-btn');
+const bulkClearBtn = document.getElementById('bulk-clear-btn');
 
 let currentPage = 1;
+let requestsById = new Map();
+const selectedIds = new Set();
 
 async function loadLeaveTypeOptions() {
   const res = await fetch('/api/leave-types');
@@ -54,6 +66,12 @@ function formatDate(value) {
   return new Date(value).toLocaleDateString('tr-TR');
 }
 
+function countDays(startDate, endDate) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  return Math.round((end - start) / 86400000) + 1;
+}
+
 function renderRow(request) {
   const tr = document.createElement('tr');
 
@@ -68,15 +86,19 @@ function renderRow(request) {
   }
 
   tr.innerHTML = `
+    <td class="col-checkbox">
+      <input type="checkbox" class="row-checkbox" data-id="${request.id}" ${selectedIds.has(request.id) ? 'checked' : ''} />
+    </td>
     <td>${request.employee_name}</td>
     <td>${request.leave_type_name}</td>
     <td>${formatDate(request.start_date)}</td>
     <td>${formatDate(request.end_date)}</td>
     <td>${request.reason || '-'}</td>
     <td><span class="status-badge status-${request.status}">${STATUS_LABELS[request.status]}</span></td>
-    <td>${request.report_file ? `<a href="/api/leave-requests/${request.id}/report" target="_blank" class="report-badge">Raporu Görüntüle</a>` : '-'}</td>
-    <td>${request.leave_balance ? `${request.leave_balance.remainingDays}/${request.leave_balance.entitledDays}` : '-'}</td>
+    <td>${request.report_file ? `<a href="/api/leave-requests/${request.id}/report" target="_blank" class="report-badge">Rapor</a>` : '-'}</td>
+    <td><a href="/api/leave-requests/${request.id}/pdf" class="report-badge">PDF İndir</a></td>
     <td>${actions.length ? `<div class="quick-actions">${actions.join('')}</div>` : '-'}</td>
+    <td>${request.leave_balance ? `${request.leave_balance.remainingDays}/${request.leave_balance.entitledDays}` : '-'}</td>
   `;
   return tr;
 }
@@ -93,6 +115,8 @@ async function loadRequests() {
     }
     const data = await res.json();
     tbody.innerHTML = '';
+    selectedIds.clear();
+    requestsById = new Map(data.requests.map((request) => [request.id, request]));
 
     if (data.requests.length === 0) {
       messageEl.textContent = 'Kriterlere uyan izin talebi bulunamadi.';
@@ -103,6 +127,8 @@ async function loadRequests() {
         tbody.appendChild(renderRow(request));
       });
     }
+
+    updateBulkActionBar();
 
     if (data.pagination) {
       renderPagination(paginationEl, {
@@ -174,6 +200,149 @@ tbody.addEventListener('click', async (event) => {
     messageEl.textContent = 'Sunucuya baglanilamadi';
     messageEl.className = 'form-message error';
   }
+});
+
+tbody.addEventListener('change', (event) => {
+  if (!event.target.classList.contains('row-checkbox')) return;
+  const id = Number(event.target.getAttribute('data-id'));
+  if (event.target.checked) {
+    selectedIds.add(id);
+  } else {
+    selectedIds.delete(id);
+  }
+  updateBulkActionBar();
+});
+
+/* ---------- Toplu islem ---------- */
+
+function updateBulkActionBar() {
+  const checkboxes = Array.from(tbody.querySelectorAll('.row-checkbox'));
+  const selected = Array.from(selectedIds)
+    .map((id) => requestsById.get(id))
+    .filter(Boolean);
+
+  bulkActionBar.hidden = selected.length === 0;
+  bulkSelectedCountEl.textContent = selected.length;
+  bulkTotalDaysEl.textContent = selected.reduce((sum, r) => sum + countDays(r.start_date, r.end_date), 0);
+  bulkTotalPeopleEl.textContent = new Set(selected.map((r) => r.employee_name)).size;
+
+  if (checkboxes.length === 0) {
+    selectAllCheckbox.checked = false;
+    selectAllCheckbox.indeterminate = false;
+  } else {
+    const allChecked = checkboxes.every((cb) => cb.checked);
+    const someChecked = checkboxes.some((cb) => cb.checked);
+    selectAllCheckbox.checked = allChecked;
+    selectAllCheckbox.indeterminate = someChecked && !allChecked;
+  }
+}
+
+selectAllCheckbox.addEventListener('change', () => {
+  const checkboxes = Array.from(tbody.querySelectorAll('.row-checkbox'));
+  checkboxes.forEach((cb) => {
+    cb.checked = selectAllCheckbox.checked;
+    const id = Number(cb.getAttribute('data-id'));
+    if (selectAllCheckbox.checked) {
+      selectedIds.add(id);
+    } else {
+      selectedIds.delete(id);
+    }
+  });
+  updateBulkActionBar();
+});
+
+bulkClearBtn.addEventListener('click', () => {
+  selectedIds.clear();
+  tbody.querySelectorAll('.row-checkbox').forEach((cb) => {
+    cb.checked = false;
+  });
+  updateBulkActionBar();
+});
+
+async function performBulkDecision(decision, approval_note) {
+  const ids = Array.from(selectedIds);
+  try {
+    const res = await fetch('/api/manager/leave-requests/bulk-decision', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids, decision, approval_note }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showActionToast(data.message || 'Islem basarisiz', 'error');
+      return;
+    }
+    const verb = decision === 'approved' ? 'onaylandi' : 'reddedildi';
+    const skippedNote = data.skippedCount
+      ? ` (${data.skippedCount} kayit zaten karara baglandigi icin atlandi)`
+      : '';
+    showActionToast(`${data.updatedCount} izin talebi basariyla ${verb}.${skippedNote}`, data.updatedCount ? 'success' : 'info');
+    loadRequests();
+  } catch (err) {
+    showActionToast('Sunucuya baglanilamadi', 'error');
+  }
+}
+
+bulkApproveBtn.addEventListener('click', async () => {
+  if (!selectedIds.size) return;
+  const confirmed = await confirmBulkApprove(selectedIds.size);
+  if (!confirmed) return;
+  performBulkDecision('approved');
+});
+
+bulkRejectBtn.addEventListener('click', async () => {
+  if (!selectedIds.size) return;
+  const result = await confirmBulkReject(selectedIds.size);
+  if (!result) return;
+  performBulkDecision('rejected', result.note);
+});
+
+function getSelectedRequestsList() {
+  return Array.from(selectedIds)
+    .map((id) => requestsById.get(id))
+    .filter(Boolean);
+}
+
+bulkPdfBtn.addEventListener('click', () => {
+  const selected = getSelectedRequestsList();
+  if (!selected.length) return;
+
+  const headers = ['Personel', 'Izin Turu', 'Baslangic', 'Bitis', 'Durum'];
+  const rows = selected.map((r) => [
+    r.employee_name,
+    r.leave_type_name,
+    formatDate(r.start_date),
+    formatDate(r.end_date),
+    STATUS_LABELS[r.status],
+  ]);
+
+  exportReportToPDF({
+    filename: `secili-ekip-talepleri-${new Date().toISOString().slice(0, 10)}.pdf`,
+    title: 'Secili Ekip Izin Talepleri',
+    subtitle: `Olusturulma: ${new Date().toLocaleString('tr-TR')}`,
+    headers,
+    rows,
+  });
+});
+
+bulkCsvBtn.addEventListener('click', () => {
+  const selected = getSelectedRequestsList();
+  if (!selected.length) return;
+
+  const headers = ['Personel', 'Izin Turu', 'Baslangic', 'Bitis', 'Durum'];
+  const rows = selected.map((r) => [
+    r.employee_name,
+    r.leave_type_name,
+    formatDate(r.start_date),
+    formatDate(r.end_date),
+    STATUS_LABELS[r.status],
+  ]);
+
+  exportReportToCSV({
+    filename: `secili-ekip-talepleri-${new Date().toISOString().slice(0, 10)}.csv`,
+    headers,
+    rows,
+  });
 });
 
 loadLeaveTypeOptions().then(loadRequests);

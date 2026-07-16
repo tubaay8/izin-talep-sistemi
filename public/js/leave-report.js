@@ -9,7 +9,6 @@ const REPORT_PAGE_SIZE = 20;
 
 const tbody = document.getElementById('report-body');
 const messageEl = document.getElementById('list-message');
-const summaryEl = document.getElementById('report-summary');
 const paginationEl = document.getElementById('pagination');
 const filterStatus = document.getElementById('filter-status');
 const filterLeaveType = document.getElementById('filter-leave-type');
@@ -32,21 +31,6 @@ function buildFilterQuery() {
   if (filterDateFrom.value) params.set('date_from', filterDateFrom.value);
   if (filterDateTo.value) params.set('date_to', filterDateTo.value);
   return params.toString();
-}
-
-function renderSummary(requests) {
-  const counts = { pending: 0, approved: 0, rejected: 0, cancelled: 0 };
-  requests.forEach((r) => {
-    counts[r.status] = (counts[r.status] || 0) + 1;
-  });
-
-  summaryEl.innerHTML = `
-    <span class="report-summary-item">Toplam: <strong>${requests.length}</strong></span>
-    <span class="report-summary-item">Bekliyor: <strong>${counts.pending}</strong></span>
-    <span class="report-summary-item">Onaylandi: <strong>${counts.approved}</strong></span>
-    <span class="report-summary-item">Reddedildi: <strong>${counts.rejected}</strong></span>
-    <span class="report-summary-item">Iptal Edildi: <strong>${counts.cancelled}</strong></span>
-  `;
 }
 
 function renderRow(request) {
@@ -107,7 +91,6 @@ async function loadReport() {
     const data = await res.json();
     currentRequests = data.requests;
     currentPage = 1;
-    renderSummary(currentRequests);
     renderTablePage();
   } catch (err) {
     messageEl.textContent = 'Rapor yuklenirken bir hata olustu';

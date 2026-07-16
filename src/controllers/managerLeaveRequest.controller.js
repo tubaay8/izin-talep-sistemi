@@ -36,4 +36,14 @@ async function decide(req, res) {
   }
 }
 
-module.exports = { listTeamRequests, decide, calendar };
+async function bulkDecide(req, res) {
+  try {
+    const { ids, decision, approval_note } = req.body;
+    const result = await leaveRequestService.bulkDecideLeaveRequests(ids, req.session.user.id, { decision, approval_note });
+    res.json({ message: 'Toplu islem tamamlandi', ...result });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
+}
+
+module.exports = { listTeamRequests, decide, bulkDecide, calendar };

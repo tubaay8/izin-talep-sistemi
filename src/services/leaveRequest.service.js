@@ -178,6 +178,29 @@ async function decideLeaveRequest(id, managerId, { decision, approval_note }) {
   return updated;
 }
 
+async function bulkDecideLeaveRequests(ids, managerId, { decision, approval_note }) {
+  if (decision === 'rejected' && !approval_note) {
+    const error = new Error('Toplu red icin bir gerekce yazmalisiniz');
+    error.status = 400;
+    throw error;
+  }
+
+  const uniqueIds = [...new Set(ids.map((id) => Number(id)))];
+  const updatedIds = [];
+  const skippedIds = [];
+
+  for (const id of uniqueIds) {
+    try {
+      await decideLeaveRequest(id, managerId, { decision, approval_note });
+      updatedIds.push(id);
+    } catch (err) {
+      skippedIds.push(id);
+    }
+  }
+
+  return { updatedCount: updatedIds.length, skippedCount: skippedIds.length, updatedIds, skippedIds };
+}
+
 async function getTeamCalendarEvents(managerId, startDate, endDate, status) {
   const requests = await leaveRequestRepository.findCalendarEventsForManager(managerId, startDate, endDate, status);
   return toCalendarEvents(requests);
@@ -216,6 +239,7 @@ module.exports = {
   cancelLeaveRequest,
   getTeamLeaveRequests,
   decideLeaveRequest,
+  bulkDecideLeaveRequests,
   getTeamCalendarEvents,
   getDepartmentConflicts,
   getDelegateCandidates,

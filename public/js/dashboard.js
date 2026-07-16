@@ -383,7 +383,6 @@ function renderManagerDashboard(user, data) {
     sidebarLink('/dashboard', 'grid', 'Dashboard', true),
     sidebarLink('/manager/leave-requests', 'list', 'Ekip Talepleri', false),
     sidebarLink('/manager/calendar', 'calendarView', 'Takvim', false),
-    sidebarLink('/manager/reports', 'barChart', 'Ekip Izin Raporu', false),
     sidebarLink('/manager/statistics', 'lineChart', 'Istatistikler', false),
   ].join('');
 }
