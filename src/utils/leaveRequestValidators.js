@@ -1,4 +1,5 @@
 const leaveTypeRepository = require('../repositories/leaveType.repository');
+const userRepository = require('../repositories/user.repository');
 
 function assertValidDateRange(start_date, end_date) {
   if (new Date(end_date) < new Date(start_date)) {
@@ -32,4 +33,33 @@ function assertReportProvided(leaveType, reportFile) {
   }
 }
 
-module.exports = { assertValidDateRange, assertLeaveTypeExists, isReportRequired, assertReportProvided };
+async function assertValidDelegate(delegateUserId, requestingUser) {
+  if (!delegateUserId) return;
+
+  if (Number(delegateUserId) === Number(requestingUser.id)) {
+    const error = new Error('Kendinizi vekil olarak secemezsiniz');
+    error.status = 400;
+    throw error;
+  }
+
+  const delegate = await userRepository.findById(delegateUserId);
+  if (!delegate || !delegate.is_active) {
+    const error = new Error('Secilen vekil aktif degil veya bulunamadi');
+    error.status = 400;
+    throw error;
+  }
+
+  if (delegate.department_id !== requestingUser.department_id) {
+    const error = new Error('Vekil, sizinle ayni departmanda olmalidir');
+    error.status = 400;
+    throw error;
+  }
+}
+
+module.exports = {
+  assertValidDateRange,
+  assertLeaveTypeExists,
+  isReportRequired,
+  assertReportProvided,
+  assertValidDelegate,
+};

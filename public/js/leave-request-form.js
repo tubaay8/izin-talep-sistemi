@@ -73,6 +73,9 @@ async function loadExistingRequest() {
   document.getElementById('start_date').value = data.request.start_date.slice(0, 10);
   document.getElementById('end_date').value = data.request.end_date.slice(0, 10);
   document.getElementById('reason').value = data.request.reason || '';
+  if (data.request.delegate_user_id) {
+    document.getElementById('delegate_user_id').value = data.request.delegate_user_id;
+  }
 
   if (data.request.report_file) {
     reportExistingFileEl.innerHTML = `Mevcut rapor: <a href="/api/leave-requests/${requestId}/report" target="_blank">Raporu Görüntüle</a>`;
@@ -94,6 +97,7 @@ form.addEventListener('submit', async (event) => {
   formData.append('start_date', document.getElementById('start_date').value);
   formData.append('end_date', document.getElementById('end_date').value);
   formData.append('reason', document.getElementById('reason').value);
+  formData.append('delegate_user_id', document.getElementById('delegate_user_id').value);
   if (reportFileInput.files[0]) {
     formData.append('report_file', reportFileInput.files[0]);
   }
@@ -119,7 +123,7 @@ form.addEventListener('submit', async (event) => {
   }
 });
 
-loadLeaveTypes().then(() => {
+Promise.all([loadLeaveTypes(), loadDelegateCandidates()]).then(() => {
   if (isEditMode) {
     loadExistingRequest();
   } else {
@@ -164,7 +168,11 @@ function showConflictState(state) {
   conflictTipEl.hidden = state !== 'warning';
 }
 
+let lastConflicts = [];
+
 function renderConflicts(data) {
+  lastConflicts = data.conflicts;
+
   if (!data.conflicts.length) {
     conflictCleanTitleEl.textContent = 'Çakışma bulunamadı';
     conflictCleanTextEl.textContent = 'Bu tarih aralığında departmanda iş yükünü etkileyecek bir durum görünmüyor.';
@@ -204,9 +212,11 @@ async function checkDepartmentConflicts() {
   const endDate = endDateInput.value;
 
   if (!startDate || !endDate || endDate < startDate) {
+    lastConflicts = [];
     conflictCleanTitleEl.textContent = 'Tarih aralığı seçilmedi';
     conflictCleanTextEl.textContent = 'Başlangıç ve bitiş tarihi seçtiğinizde çakışma analizi burada görünecek.';
     showConflictState('clean');
+    updateDelegateStatus();
     return;
   }
 
@@ -217,6 +227,7 @@ async function checkDepartmentConflicts() {
     const data = await res.json();
     if (!data.departmentName) return;
     renderConflicts(data);
+    updateDelegateStatus();
   } catch (err) {
     // sessiz basarisizlik: form gonderimini engellemeyecek ikincil bir panel
   }
@@ -226,3 +237,89 @@ showConflictState('clean');
 
 startDateInput.addEventListener('change', checkDepartmentConflicts);
 endDateInput.addEventListener('change', checkDepartmentConflicts);
+
+/* ---------- Vekalet bilgisi ---------- */
+
+const delegateSelect = document.getElementById('delegate_user_id');
+const delegateSelectedCardEl = document.getElementById('delegate-selected-card');
+const delegateSelectedAvatarEl = document.getElementById('delegate-selected-avatar');
+const delegateSelectedNameEl = document.getElementById('delegate-selected-name');
+const delegateSelectedMetaEl = document.getElementById('delegate-selected-meta');
+const delegateStatusOkEl = document.getElementById('delegate-status-ok');
+const delegateStatusWarningEl = document.getElementById('delegate-status-warning');
+const delegateSummaryEl = document.getElementById('delegate-summary');
+const delegateSummaryNameEl = document.getElementById('delegate-summary-name');
+const delegateSummaryDepartmentEl = document.getElementById('delegate-summary-department');
+const delegateSummaryDurationEl = document.getElementById('delegate-summary-duration');
+const delegateSummaryStatusEl = document.getElementById('delegate-summary-status');
+const delegateSummaryStatusIconEl = document.getElementById('delegate-summary-status-icon');
+
+const DELEGATE_STATUS_ICON_OK =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></svg>';
+const DELEGATE_STATUS_ICON_WARNING =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>';
+
+let delegateCandidates = [];
+
+async function loadDelegateCandidates() {
+  try {
+    const res = await fetch('/api/leave-requests/delegate-candidates');
+    if (!res.ok) return;
+    const data = await res.json();
+    delegateCandidates = data.candidates;
+    delegateCandidates.forEach((candidate) => {
+      const option = document.createElement('option');
+      option.value = candidate.id;
+      option.textContent = candidate.full_name;
+      delegateSelect.appendChild(option);
+    });
+  } catch (err) {
+    // sessiz basarisizlik: vekalet secimi opsiyonel bir ikincil panel
+  }
+}
+
+function updateDelegateStatus() {
+  const selectedId = delegateSelect.value;
+
+  if (!selectedId) {
+    delegateSelectedCardEl.hidden = true;
+    delegateStatusOkEl.hidden = true;
+    delegateStatusWarningEl.hidden = true;
+    delegateSummaryEl.hidden = true;
+    return;
+  }
+
+  const candidate = delegateCandidates.find((c) => String(c.id) === selectedId);
+  if (!candidate) return;
+
+  delegateSelectedCardEl.hidden = false;
+  delegateSelectedAvatarEl.textContent = getInitials(candidate.full_name);
+  delegateSelectedNameEl.textContent = candidate.full_name;
+  delegateSelectedMetaEl.textContent = `${candidate.department_name} · ${candidate.role_name}`;
+
+  delegateSummaryEl.hidden = false;
+  delegateSummaryNameEl.textContent = candidate.full_name;
+  delegateSummaryDepartmentEl.textContent = candidate.department_name;
+
+  if (!startDateInput.value || !endDateInput.value) {
+    delegateStatusOkEl.hidden = true;
+    delegateStatusWarningEl.hidden = true;
+    delegateSummaryDurationEl.textContent = 'Tarih seçilmedi';
+    delegateSummaryStatusEl.textContent = '-';
+    delegateSummaryStatusEl.className = 'delegate-summary-value';
+    delegateSummaryStatusIconEl.innerHTML = '';
+    return;
+  }
+
+  delegateSummaryDurationEl.textContent = `${formatDateTR(startDateInput.value)} - ${formatDateTR(endDateInput.value)}`;
+
+  const hasConflict = lastConflicts.some((c) => c.user_id === Number(selectedId));
+  delegateStatusOkEl.hidden = hasConflict;
+  delegateStatusWarningEl.hidden = !hasConflict;
+
+  delegateSummaryStatusEl.textContent = hasConflict ? 'Çakışıyor' : 'Uygun';
+  delegateSummaryStatusEl.className = `delegate-summary-value ${hasConflict ? 'status-conflict' : 'status-ok'}`;
+  delegateSummaryStatusIconEl.innerHTML = hasConflict ? DELEGATE_STATUS_ICON_WARNING : DELEGATE_STATUS_ICON_OK;
+}
+
+delegateSelect.addEventListener('change', updateDelegateStatus);

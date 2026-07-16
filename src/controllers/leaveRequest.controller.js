@@ -7,7 +7,7 @@ const REPORTS_DIR = path.join(__dirname, '..', '..', 'public', 'uploads', 'repor
 
 async function create(req, res) {
   try {
-    const { leave_type_id, start_date, end_date, reason } = req.body;
+    const { leave_type_id, start_date, end_date, reason, delegate_user_id } = req.body;
     const report_file = req.file ? req.file.filename : undefined;
     const request = await leaveRequestService.createLeaveRequest({
       user_id: req.session.user.id,
@@ -16,8 +16,18 @@ async function create(req, res) {
       end_date,
       reason,
       report_file,
+      delegate_user_id: delegate_user_id || null,
     });
     res.status(201).json({ message: 'Izin talebi olusturuldu', request });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
+}
+
+async function getDelegateCandidates(req, res) {
+  try {
+    const result = await leaveRequestService.getDelegateCandidates(req.session.user.id);
+    res.json(result);
   } catch (err) {
     res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
   }
@@ -55,7 +65,7 @@ async function getOne(req, res) {
 
 async function update(req, res) {
   try {
-    const { leave_type_id, start_date, end_date, reason } = req.body;
+    const { leave_type_id, start_date, end_date, reason, delegate_user_id } = req.body;
     const report_file = req.file ? req.file.filename : undefined;
     const request = await leaveRequestService.updateLeaveRequest(req.params.id, req.session.user.id, {
       leave_type_id,
@@ -63,6 +73,7 @@ async function update(req, res) {
       end_date,
       reason,
       report_file,
+      delegate_user_id: delegate_user_id || null,
     });
     res.json({ message: 'Izin talebi guncellendi', request });
   } catch (err) {
@@ -105,4 +116,14 @@ async function downloadReport(req, res) {
   }
 }
 
-module.exports = { create, listMine, getConflicts, getOne, update, cancel, downloadPdf, downloadReport };
+module.exports = {
+  create,
+  listMine,
+  getConflicts,
+  getDelegateCandidates,
+  getOne,
+  update,
+  cancel,
+  downloadPdf,
+  downloadReport,
+};

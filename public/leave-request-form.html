@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Izin Talebi - Izin Talep Sistemi</title>
-  <link rel="stylesheet" href="/css/style.css?v=24" />
-  <link rel="stylesheet" href="/css/dark-theme.css?v=14" />
+  <link rel="stylesheet" href="/css/style.css?v=26" />
+  <link rel="stylesheet" href="/css/dark-theme.css?v=15" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#8C6E63" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
@@ -148,9 +148,98 @@
         </div>
       </div>
     </aside>
+
+    <aside class="conflict-card" id="delegate-card">
+      <div class="conflict-panel-header">
+        <span class="conflict-panel-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 13.5c2.8.3 5 2.5 5 5.5"/></svg>
+        </span>
+        <div>
+          <h2>Vekalet Bilgisi</h2>
+          <p class="conflict-panel-subtitle">İzin süresince işlerinizi devralacak personeli seçin.</p>
+        </div>
+      </div>
+
+      <div class="conflict-body">
+        <div class="delegate-field">
+          <label for="delegate_user_id">Vekalet Vereceğiniz Kişi</label>
+          <select id="delegate_user_id" name="delegate_user_id">
+            <option value="">Personel seçiniz...</option>
+          </select>
+        </div>
+
+        <div class="conflict-person-card" id="delegate-selected-card" hidden>
+          <div class="conflict-person-top">
+            <span class="conflict-person-avatar" id="delegate-selected-avatar"></span>
+            <div class="conflict-person-info">
+              <div class="conflict-person-name" id="delegate-selected-name"></div>
+              <div class="conflict-person-type" id="delegate-selected-meta"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="conflict-clean" id="delegate-status-ok" hidden>
+          <span class="conflict-clean-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></svg>
+          </span>
+          <div>
+            <strong>Vekil uygun</strong>
+            <p>Seçilen personel bu tarihlerde izinli görünmüyor.</p>
+          </div>
+        </div>
+
+        <div class="conflict-warning" id="delegate-status-warning" hidden>
+          <div class="conflict-warning-head">
+            <span class="conflict-warning-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            </span>
+            <strong>Uyarı</strong>
+          </div>
+          <p>Seçilen personel aynı tarihlerde izinli görünüyor.</p>
+        </div>
+
+        <div class="delegate-summary" id="delegate-summary" hidden>
+          <h3 class="delegate-summary-title">Vekalet Özeti</h3>
+          <ul class="delegate-summary-list">
+            <li>
+              <span class="delegate-summary-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 13.5c2.8.3 5 2.5 5 5.5"/></svg></span>
+              <span class="delegate-summary-label">Vekil:</span>
+              <span class="delegate-summary-value" id="delegate-summary-name"></span>
+            </li>
+            <li>
+              <span class="delegate-summary-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/></svg></span>
+              <span class="delegate-summary-label">Departman:</span>
+              <span class="delegate-summary-value" id="delegate-summary-department"></span>
+            </li>
+            <li>
+              <span class="delegate-summary-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/></svg></span>
+              <span class="delegate-summary-label">Süre:</span>
+              <span class="delegate-summary-value" id="delegate-summary-duration"></span>
+            </li>
+            <li>
+              <span class="delegate-summary-icon" id="delegate-summary-status-icon"></span>
+              <span class="delegate-summary-label">Durum:</span>
+              <span class="delegate-summary-value" id="delegate-summary-status"></span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="conflict-summary">
+          <p>Vekil olarak seçilen personele bildirim gönderilecektir.</p>
+        </div>
+
+        <div class="conflict-tip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+          <div>
+            <strong>Not</strong>
+            <p>Yönetici izin talebini onayladığında vekalet otomatik aktif olacaktır.</p>
+          </div>
+        </div>
+      </div>
+    </aside>
   </main>
   <script src="/js/themeToggle.js"></script>
-  <script src="/js/leave-request-form.js?v=4"></script>
+  <script src="/js/leave-request-form.js?v=6"></script>
   <script src="/js/adminSidebar.js"></script>
   <script src="/js/sidebarProfileLink.js"></script>
   <script src="/js/sw-register.js"></script>

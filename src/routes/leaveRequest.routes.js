@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.get('/', leaveRequestController.listMine);
 router.get('/conflicts', leaveRequestController.getConflicts);
+router.get('/delegate-candidates', leaveRequestController.getDelegateCandidates);
 router.get('/:id/pdf', leaveRequestController.downloadPdf);
 router.get('/:id/report', leaveRequestController.downloadReport);
 router.get('/:id', leaveRequestController.getOne);

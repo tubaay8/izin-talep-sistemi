@@ -4,7 +4,7 @@ const { buildLeaveRequestFilters } = require('../utils/leaveRequestFilters');
 const SELECT_FIELDS = `
   lr.id, lr.user_id, lr.leave_type_id, lt.name AS leave_type_name,
   lr.start_date, lr.end_date, lr.reason, lr.report_file, lr.status,
-  lr.approved_by, lr.approval_note, lr.decided_at,
+  lr.delegate_user_id, lr.approved_by, lr.approval_note, lr.decided_at,
   lr.created_at, lr.updated_at
 `;
 
@@ -35,29 +35,29 @@ async function findById(id) {
   return rows[0] || null;
 }
 
-async function create({ user_id, leave_type_id, start_date, end_date, reason, report_file }) {
+async function create({ user_id, leave_type_id, start_date, end_date, reason, report_file, delegate_user_id }) {
   const [result] = await pool.query(
-    `INSERT INTO leave_requests (user_id, leave_type_id, start_date, end_date, reason, report_file)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [user_id, leave_type_id, start_date, end_date, reason || null, report_file || null]
+    `INSERT INTO leave_requests (user_id, leave_type_id, start_date, end_date, reason, report_file, delegate_user_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [user_id, leave_type_id, start_date, end_date, reason || null, report_file || null, delegate_user_id || null]
   );
   return result.insertId;
 }
 
-async function update(id, { leave_type_id, start_date, end_date, reason, report_file }) {
+async function update(id, { leave_type_id, start_date, end_date, reason, report_file, delegate_user_id }) {
   if (report_file !== undefined) {
     await pool.query(
       `UPDATE leave_requests
-       SET leave_type_id = ?, start_date = ?, end_date = ?, reason = ?, report_file = ?
+       SET leave_type_id = ?, start_date = ?, end_date = ?, reason = ?, report_file = ?, delegate_user_id = ?
        WHERE id = ?`,
-      [leave_type_id, start_date, end_date, reason || null, report_file, id]
+      [leave_type_id, start_date, end_date, reason || null, report_file, delegate_user_id || null, id]
     );
   } else {
     await pool.query(
       `UPDATE leave_requests
-       SET leave_type_id = ?, start_date = ?, end_date = ?, reason = ?
+       SET leave_type_id = ?, start_date = ?, end_date = ?, reason = ?, delegate_user_id = ?
        WHERE id = ?`,
-      [leave_type_id, start_date, end_date, reason || null, id]
+      [leave_type_id, start_date, end_date, reason || null, delegate_user_id || null, id]
     );
   }
 }

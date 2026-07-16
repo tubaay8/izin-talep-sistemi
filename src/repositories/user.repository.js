@@ -69,6 +69,19 @@ async function findAvailableManagers(excludeDepartmentId = null) {
   return rows;
 }
 
+async function findActiveByDepartmentId(departmentId, excludeUserId) {
+  const [rows] = await pool.query(
+    `SELECT u.id, u.full_name, u.department_id, d.name AS department_name, r.name AS role_name
+     FROM users u
+     JOIN roles r ON r.id = u.role_id
+     JOIN departments d ON d.id = u.department_id
+     WHERE u.department_id = ? AND u.id != ? AND u.is_active = 1
+     ORDER BY u.full_name`,
+    [departmentId, excludeUserId]
+  );
+  return rows;
+}
+
 const ADMIN_SELECT_FIELDS = `
   u.id, u.full_name, u.email, u.profile_photo, u.role_id, r.name AS role_name,
   u.department_id, d.name AS department_name,
@@ -229,4 +242,5 @@ module.exports = {
   countByActiveStatus,
   countTotal,
   findRecent,
+  findActiveByDepartmentId,
 };

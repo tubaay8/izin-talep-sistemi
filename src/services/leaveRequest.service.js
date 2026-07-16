@@ -1,7 +1,7 @@
 const leaveRequestRepository = require('../repositories/leaveRequest.repository');
 const userRepository = require('../repositories/user.repository');
 const leaveTypeRepository = require('../repositories/leaveType.repository');
-const { assertValidDateRange, assertLeaveTypeExists, assertReportProvided } = require('../utils/leaveRequestValidators');
+const { assertValidDateRange, assertLeaveTypeExists, assertReportProvided, assertValidDelegate } = require('../utils/leaveRequestValidators');
 const activityLogService = require('./activityLog.service');
 const leaveBalanceService = require('./leaveBalance.service');
 const { toCalendarEvents } = require('../utils/calendarEvent');
@@ -21,13 +21,24 @@ async function getOwnedPendingRequest(id, userId) {
   return request;
 }
 
-async function createLeaveRequest({ user_id, leave_type_id, start_date, end_date, reason, report_file }) {
+async function createLeaveRequest({ user_id, leave_type_id, start_date, end_date, reason, report_file, delegate_user_id }) {
   assertValidDateRange(start_date, end_date);
   const leaveType = await assertLeaveTypeExists(leave_type_id);
   assertReportProvided(leaveType, report_file);
   await leaveBalanceService.assertSufficientBalance(user_id, leaveType, start_date, end_date);
 
-  const id = await leaveRequestRepository.create({ user_id, leave_type_id, start_date, end_date, reason, report_file });
+  const requestingUser = await userRepository.findById(user_id);
+  await assertValidDelegate(delegate_user_id, requestingUser);
+
+  const id = await leaveRequestRepository.create({
+    user_id,
+    leave_type_id,
+    start_date,
+    end_date,
+    reason,
+    report_file,
+    delegate_user_id,
+  });
   const request = await leaveRequestRepository.findById(id);
 
   await activityLogService.log({
@@ -54,7 +65,7 @@ async function getMyLeaveRequestById(id, userId) {
   return request;
 }
 
-async function updateLeaveRequest(id, userId, { leave_type_id, start_date, end_date, reason, report_file }) {
+async function updateLeaveRequest(id, userId, { leave_type_id, start_date, end_date, reason, report_file, delegate_user_id }) {
   assertValidDateRange(start_date, end_date);
   const leaveType = await assertLeaveTypeExists(leave_type_id);
   const existing = await getOwnedPendingRequest(id, userId);
@@ -62,7 +73,10 @@ async function updateLeaveRequest(id, userId, { leave_type_id, start_date, end_d
   const effectiveReportFile = report_file !== undefined ? report_file : existing.report_file;
   assertReportProvided(leaveType, effectiveReportFile);
 
-  await leaveRequestRepository.update(id, { leave_type_id, start_date, end_date, reason, report_file });
+  const requestingUser = await userRepository.findById(userId);
+  await assertValidDelegate(delegate_user_id, requestingUser);
+
+  await leaveRequestRepository.update(id, { leave_type_id, start_date, end_date, reason, report_file, delegate_user_id });
   const request = await leaveRequestRepository.findById(id);
 
   await activityLogService.log({
@@ -169,6 +183,15 @@ async function getTeamCalendarEvents(managerId, startDate, endDate, status) {
   return toCalendarEvents(requests);
 }
 
+async function getDelegateCandidates(userId) {
+  const user = await userRepository.findByIdDetailed(userId);
+  if (!user || !user.department_id) {
+    return { candidates: [] };
+  }
+  const candidates = await userRepository.findActiveByDepartmentId(user.department_id, userId);
+  return { candidates };
+}
+
 async function getDepartmentConflicts(userId, startDate, endDate) {
   assertValidDateRange(startDate, endDate);
   const user = await userRepository.findByIdDetailed(userId);
@@ -195,4 +218,5 @@ module.exports = {
   decideLeaveRequest,
   getTeamCalendarEvents,
   getDepartmentConflicts,
+  getDelegateCandidates,
 };

@@ -242,6 +242,21 @@ html[data-theme="dark"] .form-card select:focus {
   box-shadow: 0 0 0 3px rgba(211, 163, 118, 0.3);
 }
 
+html[data-theme="dark"] .delegate-field label {
+  color: var(--text-primary);
+}
+
+html[data-theme="dark"] .delegate-field select {
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--heading);
+}
+
+html[data-theme="dark"] .delegate-field select:focus {
+  border-color: var(--dt-primary-light);
+  box-shadow: 0 0 0 3px rgba(211, 163, 118, 0.3);
+}
+
 html[data-theme="dark"] .form-card button {
   background: linear-gradient(135deg, var(--dt-primary), var(--dt-primary-light));
   color: #241609;
