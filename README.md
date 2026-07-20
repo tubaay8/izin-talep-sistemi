@@ -110,6 +110,8 @@ Sunucu varsayılan olarak `http://localhost:3000` adresinde çalışır.
 
 Şema, `database/migrations/` altındaki sıralı SQL dosyalarıyla oluşturulur (`npm run db:migrate` bunların hepsini sırayla çalıştırır ve veritabanını yoksa oluşturur). Temel tablolar:
 
+> Tüm tabloların kolonları, ilişkileri ve bir ER diyagramı için bkz. [docs/DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md).
+
 | Tablo | Açıklama |
 |---|---|
 | `roles` | Admin / Yönetici / Personel rolleri |

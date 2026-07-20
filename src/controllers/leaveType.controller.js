@@ -1,8 +1,12 @@
 const leaveTypeService = require('../services/leaveType.service');
 
 async function list(req, res) {
-  const leaveTypes = await leaveTypeService.getAllLeaveTypes();
-  res.json({ leaveTypes });
+  try {
+    const leaveTypes = await leaveTypeService.getAllLeaveTypes();
+    res.json({ leaveTypes });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
 }
 
 async function create(req, res) {

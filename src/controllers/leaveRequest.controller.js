@@ -34,14 +34,18 @@ async function getDelegateCandidates(req, res) {
 }
 
 async function listMine(req, res) {
-  const { status, leave_type_id, date_from, date_to } = req.query;
-  const requests = await leaveRequestService.getMyLeaveRequests(req.session.user.id, {
-    status,
-    leave_type_id,
-    date_from,
-    date_to,
-  });
-  res.json({ requests });
+  try {
+    const { status, leave_type_id, date_from, date_to } = req.query;
+    const requests = await leaveRequestService.getMyLeaveRequests(req.session.user.id, {
+      status,
+      leave_type_id,
+      date_from,
+      date_to,
+    });
+    res.json({ requests });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
 }
 
 async function getConflicts(req, res) {

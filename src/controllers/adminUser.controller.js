@@ -1,15 +1,19 @@
 const adminUserService = require('../services/adminUser.service');
 
 async function list(req, res) {
-  const { search, role_id, department_id, is_active, page, limit } = req.query;
-  const pagination = page && limit ? { page: Number(page), limit: Number(limit) } : null;
-  const { items, pagination: paginationResult } = await adminUserService.getAllUsers(
-    { search, role_id, department_id, is_active },
-    pagination
-  );
-  const response = { users: items };
-  if (paginationResult) response.pagination = paginationResult;
-  res.json(response);
+  try {
+    const { search, role_id, department_id, is_active, page, limit } = req.query;
+    const pagination = page && limit ? { page: Number(page), limit: Number(limit) } : null;
+    const { items, pagination: paginationResult } = await adminUserService.getAllUsers(
+      { search, role_id, department_id, is_active },
+      pagination
+    );
+    const response = { users: items };
+    if (paginationResult) response.pagination = paginationResult;
+    res.json(response);
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
 }
 
 async function getOne(req, res) {

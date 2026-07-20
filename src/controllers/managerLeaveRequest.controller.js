@@ -1,16 +1,20 @@
 const leaveRequestService = require('../services/leaveRequest.service');
 
 async function listTeamRequests(req, res) {
-  const { status, leave_type_id, date_from, date_to, search, department_id, page, limit } = req.query;
-  const pagination = page && limit ? { page: Number(page), limit: Number(limit) } : null;
-  const { items, pagination: paginationResult } = await leaveRequestService.getTeamLeaveRequests(
-    req.session.user.id,
-    { status, leave_type_id, date_from, date_to, search, department_id },
-    pagination
-  );
-  const response = { requests: items };
-  if (paginationResult) response.pagination = paginationResult;
-  res.json(response);
+  try {
+    const { status, leave_type_id, date_from, date_to, search, department_id, page, limit } = req.query;
+    const pagination = page && limit ? { page: Number(page), limit: Number(limit) } : null;
+    const { items, pagination: paginationResult } = await leaveRequestService.getTeamLeaveRequests(
+      req.session.user.id,
+      { status, leave_type_id, date_from, date_to, search, department_id },
+      pagination
+    );
+    const response = { requests: items };
+    if (paginationResult) response.pagination = paginationResult;
+    res.json(response);
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
 }
 
 async function calendar(req, res) {

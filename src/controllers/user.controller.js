@@ -1,13 +1,21 @@
 const userService = require('../services/user.service');
 
 async function listManagers(req, res) {
-  const managers = await userService.getManagers();
-  res.json({ managers });
+  try {
+    const managers = await userService.getManagers();
+    res.json({ managers });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
 }
 
 async function listAvailableManagers(req, res) {
-  const managers = await userService.getAvailableManagers(req.query.exclude_department_id);
-  res.json({ managers });
+  try {
+    const managers = await userService.getAvailableManagers(req.query.exclude_department_id);
+    res.json({ managers });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
 }
 
 module.exports = { listManagers, listAvailableManagers };

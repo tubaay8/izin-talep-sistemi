@@ -1,8 +1,12 @@
 const departmentService = require('../services/department.service');
 
 async function list(req, res) {
-  const departments = await departmentService.getAllDepartments();
-  res.json({ departments });
+  try {
+    const departments = await departmentService.getAllDepartments();
+    res.json({ departments });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
 }
 
 async function create(req, res) {
