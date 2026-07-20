@@ -479,7 +479,6 @@ async function loadDashboard() {
       return;
     }
     const { user } = await meRes.json();
-    document.body.classList.add('admin-layout');
     document.getElementById('user-name').textContent = user.full_name;
     document.getElementById('role-badge').textContent = user.role_name;
     document.getElementById('role-content').textContent = ROLE_CONTENT[user.role_name] || '';

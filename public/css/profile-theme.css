@@ -35,6 +35,15 @@ body.admin-layout .page-card {
   padding: 1.5rem;
 }
 
+/* body.admin-layout .form-card kurali (standalone form sayfalari icin,
+   ornegin giris/sifre degistirme) .profile-form-card'a da bulasip 272px
+   sol margin + 420px max-width dayatiyordu; bu da foto kart ile form
+   kart arasinda dev bir bosluk ve yukseklik uyumsuzlugu yaratiyordu. */
+body.admin-layout .profile-form-card {
+  margin: 0;
+  max-width: none;
+}
+
 .profile-form-card button {
   margin-top: auto;
 }
@@ -143,7 +152,7 @@ body.admin-layout .page-card {
 }
 
 .profile-readonly-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
 }
 
@@ -194,68 +203,10 @@ body.admin-layout .page-card {
   color: var(--badge-neutral);
 }
 
-/* Kayit Tarihi / Son Guncelleme kartlari */
-
-.profile-meta-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: stretch;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-@media (max-width: 380px) {
-  .profile-meta-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.profile-meta-card {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 0.75rem 0.9rem;
-}
-
-.profile-meta-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+.profile-readonly-icon--created,
+.profile-readonly-icon--updated {
   background: #EAD5BE;
   color: var(--color-accent);
-  flex-shrink: 0;
-}
-
-.profile-meta-icon svg {
-  width: 17px;
-  height: 17px;
-}
-
-.profile-meta-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
-}
-
-.profile-meta-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.profile-meta-value {
-  font-size: 0.92rem;
-  color: var(--color-text);
-  font-weight: 600;
 }
 
 /* ==========================================================================
@@ -345,20 +296,8 @@ html[data-theme="dark"] .profile-readonly-icon--status {
   color: var(--dt-muted);
 }
 
-html[data-theme="dark"] .profile-meta-card {
-  background: var(--dt-card);
-  border-color: var(--dt-border);
-  border-radius: 16px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-}
-
-html[data-theme="dark"] .profile-meta-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(211, 163, 118, 0.4);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-}
-
-html[data-theme="dark"] .profile-meta-icon {
+html[data-theme="dark"] .profile-readonly-icon--created,
+html[data-theme="dark"] .profile-readonly-icon--updated {
   background: rgba(211, 163, 118, 0.2);
   color: var(--dt-primary-light);
 }

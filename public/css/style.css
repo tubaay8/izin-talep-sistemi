@@ -848,9 +848,14 @@ body.admin-layout .dashboard-columns {
 
 /* Sadece dashboard-wrap disinda, bagimsiz siblings olarak kullanildiginda
    (diger admin sayfalari); dashboard.html'de header zaten dashboard-wrap'in
-   kendi padding-left'i sayesinde hizalandigi icin buraya dahil edilmez. */
+   kendi padding-left'i sayesinde hizalandigi icin buraya dahil edilmez.
+   Ust bosluk icin margin-top verilmez: body.admin-layout'un kendi
+   padding-top'u (2rem, genel body kuralindan miras) zaten bu araligi
+   sagliyor; buraya ayrica margin-top eklemek ayni araligi iki kere
+   uygulayip header'i tum diger sayfalarda dashboard.html'e gore daha
+   asagida gostermeye sebep oluyordu. */
 body.admin-layout > .dashboard-header {
-  margin: 2rem 2rem 0 272px;
+  margin: 0 2rem 0 272px;
   max-width: none;
 }
 
@@ -866,7 +871,7 @@ body.admin-layout .form-card {
 
 @media (max-width: 900px) {
   body.admin-layout > .dashboard-header {
-    margin: 1.5rem 1.5rem 0;
+    margin: 0 1.5rem;
   }
 
   body.admin-layout .page-card,
@@ -2600,5 +2605,17 @@ body.admin-layout .form-card {
 
   .stats-donut-row {
     flex-direction: column;
+  }
+
+  .stats-employee-table {
+    table-layout: fixed;
+  }
+
+  .stats-employee-table th,
+  .stats-employee-table td {
+    padding: 0.5rem 0.4rem;
+    font-size: 0.72rem;
+    white-space: normal;
+    word-break: break-word;
   }
 }

@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profilim - Izin Talep Sistemi</title>
-  <link rel="stylesheet" href="/css/style.css?v=27" />
+  <link rel="stylesheet" href="/css/style.css?v=30" />
   <link rel="stylesheet" href="/css/dark-theme.css?v=15" />
-  <link rel="stylesheet" href="/css/profile-theme.css?v=11" />
+  <link rel="stylesheet" href="/css/profile-theme.css?v=12" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#8C6E63" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
@@ -117,22 +117,15 @@
           <span class="profile-readonly-label">Hesap Durumu</span>
           <span class="profile-readonly-value" id="profile-status">-</span>
         </div>
-      </div>
-
-      <div class="profile-meta-grid">
-        <div class="profile-meta-card">
-          <span class="profile-meta-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></span>
-          <div class="profile-meta-body">
-            <span class="profile-meta-label">Kayıt Tarihi</span>
-            <span class="profile-meta-value" id="profile-created-at">-</span>
-          </div>
+        <div class="profile-readonly-field">
+          <span class="profile-readonly-icon profile-readonly-icon--created"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></span>
+          <span class="profile-readonly-label">Kayıt Tarihi</span>
+          <span class="profile-readonly-value" id="profile-created-at">-</span>
         </div>
-        <div class="profile-meta-card">
-          <span class="profile-meta-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
-          <div class="profile-meta-body">
-            <span class="profile-meta-label">Son Güncelleme</span>
-            <span class="profile-meta-value" id="profile-last-login">-</span>
-          </div>
+        <div class="profile-readonly-field">
+          <span class="profile-readonly-icon profile-readonly-icon--updated"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+          <span class="profile-readonly-label">Son Güncelleme</span>
+          <span class="profile-readonly-value" id="profile-last-login">-</span>
         </div>
       </div>
     </div>
