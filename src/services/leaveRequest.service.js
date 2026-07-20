@@ -4,6 +4,7 @@ const leaveTypeRepository = require('../repositories/leaveType.repository');
 const { assertValidDateRange, assertLeaveTypeExists, assertReportProvided, assertValidDelegate } = require('../utils/leaveRequestValidators');
 const activityLogService = require('./activityLog.service');
 const leaveBalanceService = require('./leaveBalance.service');
+const mailService = require('./mail.service');
 const { toCalendarEvents } = require('../utils/calendarEvent');
 
 async function getOwnedPendingRequest(id, userId) {
@@ -47,6 +48,43 @@ async function createLeaveRequest({ user_id, leave_type_id, start_date, end_date
     description: `Izin talebi olusturuldu: ${request.leave_type_name} (${request.start_date} - ${request.end_date})`,
     targetUserId: user_id,
   });
+
+  if (requestingUser.manager_id) {
+    const manager = await userRepository.findById(requestingUser.manager_id);
+    if (manager && manager.email) {
+      await mailService.trySend(
+        () =>
+          mailService.sendLeaveRequestCreatedEmail({
+            to: manager.email,
+            managerName: manager.full_name,
+            employeeName: requestingUser.full_name,
+            leaveTypeName: request.leave_type_name,
+            startDate: request.start_date,
+            endDate: request.end_date,
+            reason: request.reason,
+          }),
+        'izin talebi olusturuldu - yonetici bildirimi'
+      );
+    }
+  }
+
+  if (delegate_user_id) {
+    const delegate = await userRepository.findById(delegate_user_id);
+    if (delegate && delegate.email) {
+      await mailService.trySend(
+        () =>
+          mailService.sendDelegateAssignedEmail({
+            to: delegate.email,
+            delegateName: delegate.full_name,
+            employeeName: requestingUser.full_name,
+            leaveTypeName: request.leave_type_name,
+            startDate: request.start_date,
+            endDate: request.end_date,
+          }),
+        'vekalet atamasi bildirimi'
+      );
+    }
+  }
 
   return request;
 }
@@ -174,6 +212,35 @@ async function decideLeaveRequest(id, managerId, { decision, approval_note }) {
     description: `Izin talebi ${decision === 'approved' ? 'onaylandi' : 'reddedildi'}: ${updated.leave_type_name} (${employee.full_name})`,
     targetUserId: request.user_id,
   });
+
+  if (employee.email) {
+    if (decision === 'approved') {
+      await mailService.trySend(
+        () =>
+          mailService.sendLeaveRequestApprovedEmail({
+            to: employee.email,
+            employeeName: employee.full_name,
+            leaveTypeName: updated.leave_type_name,
+            startDate: updated.start_date,
+            endDate: updated.end_date,
+          }),
+        'izin talebi onaylandi bildirimi'
+      );
+    } else {
+      await mailService.trySend(
+        () =>
+          mailService.sendLeaveRequestRejectedEmail({
+            to: employee.email,
+            employeeName: employee.full_name,
+            leaveTypeName: updated.leave_type_name,
+            startDate: updated.start_date,
+            endDate: updated.end_date,
+            reason: approval_note,
+          }),
+        'izin talebi reddedildi bildirimi'
+      );
+    }
+  }
 
   return updated;
 }

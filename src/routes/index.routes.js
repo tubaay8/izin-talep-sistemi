@@ -14,6 +14,14 @@ router.get('/login', requireGuest, (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'auth.html'));
 });
 
+router.get('/forgot-password', requireGuest, (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'forgot-password.html'));
+});
+
+router.get('/reset-password', requireGuest, (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'reset-password.html'));
+});
+
 router.get('/change-password', requireAuth, (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'change-password.html'));
 });

@@ -186,6 +186,23 @@ body {
   box-shadow: 0 0 0 3px rgba(140, 110, 99, 0.18);
 }
 
+.auth-forgot-link {
+  margin: 0.5rem 0 0;
+  text-align: right;
+  font-size: 0.8rem;
+}
+
+.auth-forgot-link a {
+  color: var(--auth-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-forgot-link a:hover {
+  color: var(--auth-primary-hover);
+  text-decoration: underline;
+}
+
 .auth-submit {
   width: 100%;
   margin-top: 1.1rem;
@@ -221,7 +238,8 @@ body {
   color: var(--auth-muted);
 }
 
-.auth-switch button {
+.auth-switch button,
+.auth-switch a {
   color: var(--auth-primary);
   font-weight: 600;
   background: none;
@@ -230,9 +248,11 @@ body {
   font-size: inherit;
   font-family: inherit;
   padding: 0;
+  text-decoration: none;
 }
 
-.auth-switch button:hover {
+.auth-switch button:hover,
+.auth-switch a:hover {
   color: var(--auth-primary-hover);
   text-decoration: underline;
 }

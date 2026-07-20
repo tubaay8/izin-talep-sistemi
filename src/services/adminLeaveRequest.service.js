@@ -1,8 +1,10 @@
 const leaveRequestRepository = require('../repositories/leaveRequest.repository');
 const leaveTypeRepository = require('../repositories/leaveType.repository');
+const userRepository = require('../repositories/user.repository');
 const { assertValidDateRange, assertLeaveTypeExists, assertReportProvided } = require('../utils/leaveRequestValidators');
 const activityLogService = require('./activityLog.service');
 const leaveBalanceService = require('./leaveBalance.service');
+const mailService = require('./mail.service');
 const { toCalendarEvents } = require('../utils/calendarEvent');
 
 const VALID_STATUSES = ['pending', 'approved', 'rejected', 'cancelled'];
@@ -120,6 +122,38 @@ async function updateStatus(id, adminId, { status, approval_note }) {
     description: `Izin talebi ${STATUS_DESCRIPTIONS[status]} (admin mudahalesi): ${request.leave_type_name} (${request.employee_name})`,
     targetUserId: request.user_id,
   });
+
+  if (status === 'approved' || status === 'rejected') {
+    const employee = await userRepository.findById(request.user_id);
+    if (employee && employee.email) {
+      if (status === 'approved') {
+        await mailService.trySend(
+          () =>
+            mailService.sendLeaveRequestApprovedEmail({
+              to: employee.email,
+              employeeName: employee.full_name,
+              leaveTypeName: updated.leave_type_name,
+              startDate: updated.start_date,
+              endDate: updated.end_date,
+            }),
+          'izin talebi onaylandi bildirimi (admin)'
+        );
+      } else {
+        await mailService.trySend(
+          () =>
+            mailService.sendLeaveRequestRejectedEmail({
+              to: employee.email,
+              employeeName: employee.full_name,
+              leaveTypeName: updated.leave_type_name,
+              startDate: updated.start_date,
+              endDate: updated.end_date,
+              reason: approval_note,
+            }),
+          'izin talebi reddedildi bildirimi (admin)'
+        );
+      }
+    }
+  }
 
   return updated;
 }

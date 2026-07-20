@@ -1,4 +1,5 @@
 const authService = require('../services/auth.service');
+const passwordResetService = require('../services/passwordReset.service');
 
 async function login(req, res) {
   try {
@@ -42,4 +43,24 @@ async function changePassword(req, res) {
   }
 }
 
-module.exports = { login, logout, me, changePassword };
+async function forgotPassword(req, res) {
+  try {
+    const { email } = req.body;
+    const result = await passwordResetService.requestReset(email);
+    res.json(result);
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
+}
+
+async function resetPassword(req, res) {
+  try {
+    const { token, new_password } = req.body;
+    await passwordResetService.resetPassword(token, new_password);
+    res.json({ message: 'Sifreniz basariyla guncellendi' });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Sunucu hatasi' });
+  }
+}
+
+module.exports = { login, logout, me, changePassword, forgotPassword, resetPassword };
