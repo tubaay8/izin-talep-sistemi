@@ -1,5 +1,13 @@
-ALTER TABLE leave_requests
-  ADD COLUMN IF NOT EXISTS delegate_user_id INT UNSIGNED NULL AFTER reason;
+SET @col_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'leave_requests' AND COLUMN_NAME = 'delegate_user_id'
+);
+SET @col_sql = IF(@col_exists = 0,
+  'ALTER TABLE leave_requests ADD COLUMN delegate_user_id INT UNSIGNED NULL AFTER reason',
+  'SELECT 1');
+PREPARE col_stmt FROM @col_sql;
+EXECUTE col_stmt;
+DEALLOCATE PREPARE col_stmt;
 
 SET @fk_exists = (
   SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS

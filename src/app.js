@@ -22,6 +22,13 @@ const { requireAuth, requireRole } = require('./middlewares/auth.middleware');
 
 const app = express();
 
+// Railway gibi platformlarda uygulama HTTPS'i sonlandiran bir proxy'nin
+// arkasinda calisir; bu olmadan Express baglantiyi guvensiz sanip
+// "secure" cookie'yi hic gondermez, oturumlar kalici olmaz.
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -32,6 +39,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
       maxAge: 1000 * 60 * 60 * 8,
     },
   })

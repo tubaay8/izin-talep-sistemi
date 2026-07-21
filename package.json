@@ -2,6 +2,9 @@
   "name": "izin-talep-sistemi",
   "version": "1.0.0",
   "main": "src/server.js",
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",

@@ -1,6 +1,14 @@
 -- Her departmanin kendine ozel, tek bir yoneticisi olur (1 yonetici sadece 1 departmana atanabilir).
-ALTER TABLE departments
-  ADD COLUMN IF NOT EXISTS manager_id INT UNSIGNED NULL AFTER name;
+SET @col_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'departments' AND COLUMN_NAME = 'manager_id'
+);
+SET @col_sql = IF(@col_exists = 0,
+  'ALTER TABLE departments ADD COLUMN manager_id INT UNSIGNED NULL AFTER name',
+  'SELECT 1');
+PREPARE col_stmt FROM @col_sql;
+EXECUTE col_stmt;
+DEALLOCATE PREPARE col_stmt;
 
 SET @fk_exists = (
   SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
