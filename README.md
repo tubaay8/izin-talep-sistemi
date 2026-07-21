@@ -10,6 +10,7 @@
 - [Kurulum](#kurulum)
 - [.env Ayarları](#env-ayarları)
 - [Veritabanı Kurulumu](#veritabanı-kurulumu)
+- [Testler](#testler)
 - [Roller](#roller)
 - [Ekran Görüntüleri](#ekran-görüntüleri)
 - [Geliştirici Bilgileri](#geliştirici-bilgileri)
@@ -131,6 +132,16 @@ Sunucu varsayılan olarak `http://localhost:3000` adresinde çalışır.
 | Yönetici | `yonetici@example.com` | `sifre123` |
 
 Personel hesabı seed edilmez; Admin ile giriş yaptıktan sonra **Kullanıcı Yönetimi** sayfasından yeni bir Personel hesabı oluşturup test edebilirsin.
+
+## Testler
+
+Jest + Supertest ile yazılmış entegrasyon testleri var (`tests/` klasörü) — giriş, şifre sıfırlama, izin talebi oluşturma/güncelleme/iptal, yönetici ve admin onay/red akışları ile rol bazlı yetkilendirme sınırlarını gerçek bir Express uygulaması + ayrı bir test veritabanına karşı test eder.
+
+```bash
+npm test
+```
+
+Testler kendi izole veritabanını (`DB_NAME` + `_test`) her çalıştırmada sıfırdan kurup migration/seed dosyalarını uygular, bittiğinde siler — **geliştirme veritabanına asla dokunmaz**. `.env` dosyandaki DB bağlantı bilgilerini kullanır, ayrı bir yapılandırmaya gerek yoktur.
 
 ## Roller
 
