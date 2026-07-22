@@ -772,3 +772,58 @@ html[data-theme="dark"] .stats-donut-legend-value {
 html[data-theme="dark"] .stat-sub {
   color: var(--text-secondary);
 }
+
+/* Kullanicilar kart gridi + detay paneli */
+
+html[data-theme="dark"] {
+  --avatar-1-bg: #4A3A22; --avatar-1-fg: #E8C79A;
+  --avatar-2-bg: #45322A; --avatar-2-fg: #E3B79C;
+  --avatar-3-bg: #423C22; --avatar-3-fg: #E0D19A;
+  --avatar-4-bg: #402C38; --avatar-4-fg: #DCADC5;
+  --avatar-5-bg: #2F3624; --avatar-5-fg: #B9CC9C;
+  --avatar-6-bg: #382A44; --avatar-6-fg: #C7AEDC;
+}
+
+html[data-theme="dark"] .user-card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+html[data-theme="dark"] .user-card-name,
+html[data-theme="dark"] .user-drawer-name {
+  color: var(--heading);
+}
+
+html[data-theme="dark"] .user-card-dept,
+html[data-theme="dark"] .user-card-status,
+html[data-theme="dark"] .user-drawer-kv dt,
+html[data-theme="dark"] .user-drawer-section h3 {
+  color: var(--text-secondary);
+}
+
+html[data-theme="dark"] .role-pill--admin { background: var(--dt-primary); color: var(--dt-bg-1); }
+html[data-theme="dark"] .role-pill--yonetici { background: var(--dt-primary-light); color: var(--dt-bg-1); }
+html[data-theme="dark"] .role-pill--personel { background: var(--surface-2); color: var(--text-primary); }
+
+html[data-theme="dark"] .user-drawer {
+  background: var(--surface);
+  border-left-color: var(--border);
+}
+
+html[data-theme="dark"] .user-drawer-head,
+html[data-theme="dark"] .user-drawer-actions {
+  border-color: var(--border);
+}
+
+html[data-theme="dark"] .user-drawer-kv dd {
+  color: var(--text-primary);
+}
+
+html[data-theme="dark"] .btn-drawer--outline {
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+html[data-theme="dark"] .btn-drawer--outline:hover {
+  background: var(--surface-2);
+}

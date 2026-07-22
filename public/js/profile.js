@@ -25,7 +25,7 @@ const ROLE_SIDEBAR_MENUS = {
   ],
   Admin: [
     ['/dashboard', 'grid', 'Anasayfa'],
-    ['/admin/users', 'users', 'Kullanıcı Yönetimi'],
+    ['/admin/users', 'users', 'Kullanıcılar'],
     ['/admin/leave-requests', 'list', 'Tüm İzin Talepleri'],
     ['/admin/calendar', 'calendarView', 'Takvim'],
     ['/admin/departments', 'building', 'Departman Yönetimi'],

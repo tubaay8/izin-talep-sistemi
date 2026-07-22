@@ -462,7 +462,7 @@ function renderAdminDashboard(user, data) {
 
   document.getElementById('sidebar-menu').innerHTML = [
     sidebarLink('/dashboard', 'grid', 'Dashboard', true),
-    sidebarLink('/admin/users', 'users', 'Kullanici Yonetimi', false),
+    sidebarLink('/admin/users', 'users', 'Kullanicilar', false),
     sidebarLink('/admin/leave-requests', 'list', 'Tum Izin Talepleri', false),
     sidebarLink('/admin/calendar', 'calendarView', 'Takvim', false),
     sidebarLink('/admin/departments', 'building', 'Departman Yonetimi', false),

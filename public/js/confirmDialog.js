@@ -84,6 +84,29 @@ function showErrorDialog(message) {
   });
 }
 
+async function confirmResetPassword(fullName) {
+  const result = await Swal.fire({
+    title: 'Sifreyi Sifirla',
+    html: `<strong>${fullName}</strong> icin yeni bir sifre belirleyin.`,
+    icon: 'question',
+    input: 'text',
+    inputLabel: 'Yeni Sifre',
+    inputPlaceholder: 'En az 6 karakter',
+    inputValidator: (value) => (!value || value.trim().length < 6 ? 'Sifre en az 6 karakter olmalidir' : undefined),
+    showCancelButton: true,
+    confirmButtonText: 'Sifreyi Guncelle',
+    cancelButtonText: 'Vazgec',
+    confirmButtonColor: DIALOG_COLORS.neutral,
+    cancelButtonColor: '#8C8C8C',
+    reverseButtons: true,
+  });
+
+  if (!result.isConfirmed) {
+    return null;
+  }
+  return result.value.trim();
+}
+
 function confirmStatusChange(label) {
   return confirmDialog({
     title: 'Durumu Degistir',

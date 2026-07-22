@@ -1,4 +1,4 @@
-const CACHE_NAME = 'izin-talep-sistemi-v21';
+const CACHE_NAME = 'izin-talep-sistemi-v22';
 const OFFLINE_URL = '/offline.html';
 
 const PRECACHE_ASSETS = [
