@@ -49,6 +49,12 @@ app.use(
 // (/api/leave-requests/:id/report) sunulur; dogrudan statik erisim engellenir.
 app.use('/uploads', (req, res) => res.status(404).json({ message: 'Bulunamadi' }));
 
+// Yuklenen dosyalar (profil fotograflari, saglik raporlari) 'public/' disinda,
+// 'storage/' altinda tutulur; Railway'de bu klasore bir Volume baglanip
+// deploy'lar arasinda kalici olmasi saglanir (public/ her deploy'da git'ten
+// yeniden olusturulur, kalici depolama icin uygun degildir).
+app.use('/avatars', express.static(path.join(__dirname, '..', 'storage', 'avatars')));
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.use('/api/auth', authRoutes);

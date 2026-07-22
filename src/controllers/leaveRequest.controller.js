@@ -3,7 +3,7 @@ const leaveRequestService = require('../services/leaveRequest.service');
 const leaveRequestPdfService = require('../services/leaveRequestPdf.service');
 const { buildLeaveFormPdf } = require('../utils/leaveFormPdfBuilder');
 
-const REPORTS_DIR = path.join(__dirname, '..', '..', 'public', 'uploads', 'reports');
+const REPORTS_DIR = path.join(__dirname, '..', '..', 'storage', 'reports');
 
 async function create(req, res) {
   try {

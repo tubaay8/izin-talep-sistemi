@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 
-const UPLOAD_DIR = path.join(__dirname, '..', '..', 'public', 'avatars');
+const UPLOAD_DIR = path.join(__dirname, '..', '..', 'storage', 'avatars');
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
