@@ -126,8 +126,10 @@ async function updateStatus(id, adminId, { status, approval_note }) {
   if (status === 'approved' || status === 'rejected') {
     const employee = await userRepository.findById(request.user_id);
     if (employee && employee.email) {
+      // Bilerek await edilmiyor: durum guncelleme isteminin cevabi mail
+      // gonderimini beklemeden hemen donmeli (SMTP yavas/erisilemez olsa bile).
       if (status === 'approved') {
-        await mailService.trySend(
+        mailService.trySend(
           () =>
             mailService.sendLeaveRequestApprovedEmail({
               to: employee.email,
@@ -139,7 +141,7 @@ async function updateStatus(id, adminId, { status, approval_note }) {
           'izin talebi onaylandi bildirimi (admin)'
         );
       } else {
-        await mailService.trySend(
+        mailService.trySend(
           () =>
             mailService.sendLeaveRequestRejectedEmail({
               to: employee.email,

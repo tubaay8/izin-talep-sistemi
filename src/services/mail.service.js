@@ -12,6 +12,13 @@ function getTransporter() {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS,
       },
+      // SMTP sunucusuna erisilemezse (yanlis port, aginn engellemesi vb.)
+      // nodemailer'in varsayilan zaman asimlari (dakikalarca) yerine hizli
+      // basarisiz olsun; boylece bunu bekleyen istekler kullanicinin
+      // onunde uzun sure asili kalmaz.
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
     });
   }
   return transporter;

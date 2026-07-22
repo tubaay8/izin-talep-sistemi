@@ -52,7 +52,9 @@ async function createLeaveRequest({ user_id, leave_type_id, start_date, end_date
   if (requestingUser.manager_id) {
     const manager = await userRepository.findById(requestingUser.manager_id);
     if (manager && manager.email) {
-      await mailService.trySend(
+      // Bilerek await edilmiyor: mail gonderimi yavas/basarisiz olsa bile
+      // izin talebi olusturma isteminin cevabi beklemeden donmeli.
+      mailService.trySend(
         () =>
           mailService.sendLeaveRequestCreatedEmail({
             to: manager.email,
@@ -71,7 +73,7 @@ async function createLeaveRequest({ user_id, leave_type_id, start_date, end_date
   if (delegate_user_id) {
     const delegate = await userRepository.findById(delegate_user_id);
     if (delegate && delegate.email) {
-      await mailService.trySend(
+      mailService.trySend(
         () =>
           mailService.sendDelegateAssignedEmail({
             to: delegate.email,
@@ -214,8 +216,10 @@ async function decideLeaveRequest(id, managerId, { decision, approval_note }) {
   });
 
   if (employee.email) {
+    // Bilerek await edilmiyor: karar isteminin cevabi mail gonderimini
+    // beklemeden hemen donmeli (SMTP yavas/erisilemez olsa bile).
     if (decision === 'approved') {
-      await mailService.trySend(
+      mailService.trySend(
         () =>
           mailService.sendLeaveRequestApprovedEmail({
             to: employee.email,
@@ -227,7 +231,7 @@ async function decideLeaveRequest(id, managerId, { decision, approval_note }) {
         'izin talebi onaylandi bildirimi'
       );
     } else {
-      await mailService.trySend(
+      mailService.trySend(
         () =>
           mailService.sendLeaveRequestRejectedEmail({
             to: employee.email,
