@@ -36,6 +36,10 @@ function exportReportToPDF({ filename, title, subtitle, headers, rows }) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'landscape' });
 
+  // Varsayilan Helvetica Turkce karakterleri (ş, ğ, ı, İ, ö, ü, ç) dogru
+  // basamiyor; Unicode destekli DejaVu Sans'i kullaniyoruz.
+  doc.setFont('DejaVuSans', 'normal');
+
   doc.setFontSize(14);
   doc.text(title, 14, 15);
 
@@ -49,8 +53,8 @@ function exportReportToPDF({ filename, title, subtitle, headers, rows }) {
     head: [headers],
     body: rows,
     startY: subtitle ? 26 : 20,
-    styles: { fontSize: 8, cellPadding: 2 },
-    headStyles: { fillColor: [44, 62, 80] },
+    styles: { fontSize: 8, cellPadding: 2, font: 'DejaVuSans', fontStyle: 'normal' },
+    headStyles: { fillColor: [44, 62, 80], font: 'DejaVuSans', fontStyle: 'bold' },
   });
 
   doc.save(filename);

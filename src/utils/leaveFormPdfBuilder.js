@@ -1,6 +1,10 @@
 const fs = require('fs');
+const path = require('path');
 const PDFDocument = require('pdfkit');
 const { calculateDayCount } = require('./leaveDayCount');
+
+const DEFAULT_FONT_REGULAR = path.join(__dirname, '../../node_modules/dejavu-fonts-ttf/ttf/DejaVuSans.ttf');
+const DEFAULT_FONT_BOLD = path.join(__dirname, '../../node_modules/dejavu-fonts-ttf/ttf/DejaVuSans-Bold.ttf');
 
 const STATUS_LABELS = {
   pending: 'Bekliyor',
@@ -41,16 +45,16 @@ function registerFonts(doc) {
     if (regularPath && fs.existsSync(regularPath)) {
       doc.registerFont('form-regular', regularPath);
     } else {
-      doc.registerFont('form-regular', 'Helvetica');
+      doc.registerFont('form-regular', DEFAULT_FONT_REGULAR);
     }
     if (boldPath && fs.existsSync(boldPath)) {
       doc.registerFont('form-bold', boldPath);
     } else {
-      doc.registerFont('form-bold', 'Helvetica-Bold');
+      doc.registerFont('form-bold', DEFAULT_FONT_BOLD);
     }
   } catch (err) {
-    doc.registerFont('form-regular', 'Helvetica');
-    doc.registerFont('form-bold', 'Helvetica-Bold');
+    doc.registerFont('form-regular', DEFAULT_FONT_REGULAR);
+    doc.registerFont('form-bold', DEFAULT_FONT_BOLD);
   }
 }
 

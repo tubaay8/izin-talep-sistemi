@@ -100,7 +100,7 @@ Sunucu varsayılan olarak `http://localhost:3000` adresinde çalışır.
 | `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | MySQL bağlantı bilgileri |
 | `SESSION_SECRET` | Oturum (session) imzalama anahtarı — production'da mutlaka değiştirilmeli |
 | `COMPANY_NAME`, `COMPANY_ADDRESS` | PDF çıktılarında görünen şirket bilgileri |
-| `PDF_FONT_REGULAR`, `PDF_FONT_BOLD` | PDF oluşturma için sistemdeki font dosya yolları |
+| `PDF_FONT_REGULAR`, `PDF_FONT_BOLD` | Opsiyonel — PDF için özel bir font kullanmak istersen sunucudaki dosya yolunu yaz. Belirtilmezse Türkçe karakterleri destekleyen dahili font (DejaVu Sans) otomatik kullanılır |
 | `MAILTRAP_API_TOKEN`, `MAILTRAP_INBOX_ID` | [Mailtrap](https://mailtrap.io) sandbox'ının HTTPS API bilgileri — ham SMTP yerine tercih edildi çünkü bazı barındırma platformlarında (örn. Railway) SMTP portlarına giden bağlantı engellenip zaman aşımına uğrayabiliyor |
 | `MAIL_FROM` | Gönderilen e-postalarda görünecek "kimden" adresi |
 | `APP_URL` | Şifre sıfırlama gibi maillerdeki bağlantıların oluşturulacağı taban adres (örn. `http://localhost:3000`) |

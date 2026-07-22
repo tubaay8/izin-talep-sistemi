@@ -23,6 +23,7 @@
     "@fullcalendar/timegrid": "^6.1.21",
     "bcrypt": "^6.0.0",
     "chart.js": "^4.5.1",
+    "dejavu-fonts-ttf": "^2.37.3",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-session": "^1.19.0",

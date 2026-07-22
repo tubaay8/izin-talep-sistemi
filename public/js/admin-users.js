@@ -103,7 +103,7 @@ function renderCard(user) {
   card.className = 'user-card';
   const tone = avatarTone(user.full_name);
   const avatarInner = user.profile_photo
-    ? `<img src="/avatars/${user.profile_photo}" alt="" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`
+    ? `<img src="/avatars/${user.profile_photo}" alt="" onerror="this.outerHTML='${initials(user.full_name)}'" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`
     : initials(user.full_name);
   card.innerHTML = `
     <span class="user-card-avatar" style="background:var(--avatar-${tone}-bg); color:var(--avatar-${tone}-fg); overflow:hidden;">${avatarInner}</span>
@@ -128,7 +128,7 @@ function openDrawer(user, card) {
   const tone = avatarTone(user.full_name);
   const avatarEl = document.getElementById('drawer-avatar');
   if (user.profile_photo) {
-    avatarEl.innerHTML = `<img src="/avatars/${user.profile_photo}" alt="" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`;
+    avatarEl.innerHTML = `<img src="/avatars/${user.profile_photo}" alt="" onerror="this.outerHTML='${initials(user.full_name)}'" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`;
   } else {
     avatarEl.textContent = initials(user.full_name);
   }
