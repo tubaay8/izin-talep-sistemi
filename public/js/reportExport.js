@@ -1,5 +1,10 @@
 function csvEscapeValue(value) {
   const str = String(value ?? '');
+  // Excel, gg.aa.yyyy bicimindeki metinleri tarih sanip sayiya cevirir; dar
+  // sutunlarda bu da "####" olarak gozukur. Formul gibi yazip metin kalmasini saglıyoruz.
+  if (/^\d{2}\.\d{2}\.\d{4}$/.test(str)) {
+    return `="${str}"`;
+  }
   if (/["\n;]/.test(str)) {
     return `"${str.replace(/"/g, '""')}"`;
   }
