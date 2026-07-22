@@ -101,7 +101,7 @@ Sunucu varsayılan olarak `http://localhost:3000` adresinde çalışır.
 | `SESSION_SECRET` | Oturum (session) imzalama anahtarı — production'da mutlaka değiştirilmeli |
 | `COMPANY_NAME`, `COMPANY_ADDRESS` | PDF çıktılarında görünen şirket bilgileri |
 | `PDF_FONT_REGULAR`, `PDF_FONT_BOLD` | PDF oluşturma için sistemdeki font dosya yolları |
-| `MAIL_HOST`, `MAIL_PORT`, `MAIL_SECURE`, `MAIL_USER`, `MAIL_PASS` | SMTP sunucu bilgileri (bu proje [Mailtrap](https://mailtrap.io) sandbox ile test edilmiştir) |
+| `MAILTRAP_API_TOKEN`, `MAILTRAP_INBOX_ID` | [Mailtrap](https://mailtrap.io) sandbox'ının HTTPS API bilgileri — ham SMTP yerine tercih edildi çünkü bazı barındırma platformlarında (örn. Railway) SMTP portlarına giden bağlantı engellenip zaman aşımına uğrayabiliyor |
 | `MAIL_FROM` | Gönderilen e-postalarda görünecek "kimden" adresi |
 | `APP_URL` | Şifre sıfırlama gibi maillerdeki bağlantıların oluşturulacağı taban adres (örn. `http://localhost:3000`) |
 

@@ -31,7 +31,6 @@
     "jspdf-autotable": "^5.0.8",
     "multer": "^2.2.0",
     "mysql2": "^3.22.5",
-    "nodemailer": "^9.0.3",
     "pdfkit": "^0.19.1",
     "sweetalert2": "^11.26.25"
   },

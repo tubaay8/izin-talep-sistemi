@@ -1,31 +1,44 @@
-const nodemailer = require('nodemailer');
+// Mailtrap'in test kutusuna (sandbox) HTTPS API uzerinden gonderim yapilir.
+// Onceden nodemailer + ham SMTP kullaniliyordu; bazi barindirma
+// platformlarinda (orn. Railway) SMTP portlarina (2525/587) giden baglanti
+// zaman asimina ugrayabiliyor. HTTPS zaten uygulamanin kendisi icin acik
+// oldugundan, ayni protokolu mail gonderimi icin de kullanmak bu sorunu
+// tamamen ortadan kaldirir.
+const MAILTRAP_API_URL = `https://sandbox.api.mailtrap.io/api/send/${process.env.MAILTRAP_INBOX_ID}`;
 
-let transporter = null;
-
-function getTransporter() {
-  if (!transporter) {
-    transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      port: Number(process.env.MAIL_PORT),
-      secure: process.env.MAIL_SECURE === 'true',
-      auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
-      },
-      // SMTP sunucusuna erisilemezse (yanlis port, aginn engellemesi vb.)
-      // nodemailer'in varsayilan zaman asimlari (dakikalarca) yerine hizli
-      // basarisiz olsun; boylece bunu bekleyen istekler kullanicinin
-      // onunde uzun sure asili kalmaz.
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000,
-    });
+function parseFromAddress(raw) {
+  const match = /^(.*)<(.+)>$/.exec(raw || '');
+  if (match) {
+    return { name: match[1].trim().replace(/^"|"$/g, ''), email: match[2].trim() };
   }
-  return transporter;
+  return { email: raw };
+}
+
+async function sendViaMailtrapApi({ to, subject, html }) {
+  const res = await fetch(MAILTRAP_API_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.MAILTRAP_API_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: parseFromAddress(process.env.MAIL_FROM),
+      to: [{ email: to }],
+      subject,
+      html,
+    }),
+  });
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`Mailtrap API ${res.status}${detail ? `: ${detail}` : ''}`);
+  }
 }
 
 async function verifyConnection() {
-  await getTransporter().verify();
+  if (!process.env.MAILTRAP_API_TOKEN || !process.env.MAILTRAP_INBOX_ID) {
+    throw new Error('MAILTRAP_API_TOKEN veya MAILTRAP_INBOX_ID tanimli degil');
+  }
 }
 
 function formatDateTR(dateStr) {
@@ -196,8 +209,7 @@ function buildDelegateAssignedHtml({ delegateName, employeeName, leaveTypeName, 
 }
 
 async function sendPasswordResetEmail({ to, fullName, resetUrl }) {
-  await getTransporter().sendMail({
-    from: process.env.MAIL_FROM,
+  await sendViaMailtrapApi({
     to,
     subject: 'Şifre Sıfırlama Talebi',
     html: buildPasswordResetEmailHtml({ fullName, resetUrl }),
@@ -205,8 +217,7 @@ async function sendPasswordResetEmail({ to, fullName, resetUrl }) {
 }
 
 async function sendLeaveRequestCreatedEmail({ to, managerName, employeeName, leaveTypeName, startDate, endDate, reason }) {
-  await getTransporter().sendMail({
-    from: process.env.MAIL_FROM,
+  await sendViaMailtrapApi({
     to,
     subject: 'Yeni İzin Talebi',
     html: buildLeaveRequestCreatedHtml({ managerName, employeeName, leaveTypeName, startDate, endDate, reason }),
@@ -214,8 +225,7 @@ async function sendLeaveRequestCreatedEmail({ to, managerName, employeeName, lea
 }
 
 async function sendLeaveRequestApprovedEmail({ to, employeeName, leaveTypeName, startDate, endDate }) {
-  await getTransporter().sendMail({
-    from: process.env.MAIL_FROM,
+  await sendViaMailtrapApi({
     to,
     subject: 'İzin Talebiniz Onaylandı',
     html: buildLeaveRequestApprovedHtml({ employeeName, leaveTypeName, startDate, endDate }),
@@ -223,8 +233,7 @@ async function sendLeaveRequestApprovedEmail({ to, employeeName, leaveTypeName, 
 }
 
 async function sendLeaveRequestRejectedEmail({ to, employeeName, leaveTypeName, startDate, endDate, reason }) {
-  await getTransporter().sendMail({
-    from: process.env.MAIL_FROM,
+  await sendViaMailtrapApi({
     to,
     subject: 'İzin Talebiniz Reddedildi',
     html: buildLeaveRequestRejectedHtml({ employeeName, leaveTypeName, startDate, endDate, reason }),
@@ -232,8 +241,7 @@ async function sendLeaveRequestRejectedEmail({ to, employeeName, leaveTypeName, 
 }
 
 async function sendDelegateAssignedEmail({ to, delegateName, employeeName, leaveTypeName, startDate, endDate }) {
-  await getTransporter().sendMail({
-    from: process.env.MAIL_FROM,
+  await sendViaMailtrapApi({
     to,
     subject: 'Vekalet Ataması',
     html: buildDelegateAssignedHtml({ delegateName, employeeName, leaveTypeName, startDate, endDate }),
