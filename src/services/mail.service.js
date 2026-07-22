@@ -7,11 +7,15 @@
 const MAILTRAP_API_URL = `https://sandbox.api.mailtrap.io/api/send/${process.env.MAILTRAP_INBOX_ID}`;
 
 function parseFromAddress(raw) {
-  const match = /^(.*)<(.+)>$/.exec(raw || '');
+  // Bazi ortamlarda (orn. Railway) degisken degeri disaridan tirnak
+  // isaretleriyle birlikte girilmis olabilir (.env dosyasinin aksine,
+  // bu tirnaklari otomatik silmez); once bunlari temizliyoruz.
+  const cleaned = String(raw || '').trim().replace(/^"|"$/g, '');
+  const match = /^(.*)<(.+)>$/.exec(cleaned);
   if (match) {
     return { name: match[1].trim().replace(/^"|"$/g, ''), email: match[2].trim() };
   }
-  return { email: raw };
+  return { email: cleaned };
 }
 
 async function sendViaMailtrapApi({ to, subject, html }) {
