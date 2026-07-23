@@ -18,7 +18,7 @@ function parseFromAddress(raw) {
   return { email: cleaned };
 }
 
-async function sendViaMailtrapApi({ to, subject, html }) {
+async function postToMailtrap({ to, subject, html }) {
   const res = await fetch(MAILTRAP_API_URL, {
     method: 'POST',
     headers: {
@@ -37,6 +37,22 @@ async function sendViaMailtrapApi({ to, subject, html }) {
     const detail = await res.text().catch(() => '');
     throw new Error(`Mailtrap API ${res.status}${detail ? `: ${detail}` : ''}`);
   }
+}
+
+// Mailtrap'in sandbox plani saniyede birden fazla istege izin vermiyor
+// (429 "Too many emails per second"). Ayni islemde (orn. vekalet atanmis
+// bir izin talebi) birden fazla mail ayni anda tetiklenebildigi icin,
+// gonderimleri burada tek bir kuyrukta sirayla ve aralikli isliyoruz.
+const MIN_INTERVAL_MS = 1200;
+let queueTail = Promise.resolve();
+
+function sendViaMailtrapApi(payload) {
+  const attempt = queueTail.then(
+    () => postToMailtrap(payload),
+    () => postToMailtrap(payload)
+  );
+  queueTail = attempt.catch(() => {}).then(() => new Promise((resolve) => setTimeout(resolve, MIN_INTERVAL_MS)));
+  return attempt;
 }
 
 async function verifyConnection() {
