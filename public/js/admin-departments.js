@@ -2,15 +2,11 @@ const tbody = document.getElementById('departments-body');
 const messageEl = document.getElementById('list-message');
 const createForm = document.getElementById('create-form');
 const newDepartmentName = document.getElementById('new-department-name');
-const newDepartmentManager = document.getElementById('new-department-manager');
 
 let departments = [];
 
-async function fetchAvailableManagers(excludeDepartmentId) {
-  const url = excludeDepartmentId
-    ? `/api/managers/available?exclude_department_id=${excludeDepartmentId}`
-    : '/api/managers/available';
-  const res = await fetch(url);
+async function fetchAvailableManagers(departmentId) {
+  const res = await fetch(`/api/managers/available?department_id=${departmentId}&exclude_department_id=${departmentId}`);
   const data = await res.json();
   return data.managers || [];
 }
@@ -25,11 +21,6 @@ function managerOptionsHtml(managers, selectedId) {
       )
       .join('')
   );
-}
-
-async function populateCreateManagerSelect() {
-  const managers = await fetchAvailableManagers();
-  newDepartmentManager.innerHTML = managerOptionsHtml(managers, null);
 }
 
 const ICON_EDIT =
@@ -92,7 +83,6 @@ async function loadDepartments() {
       messageEl.textContent = '';
     }
     renderList();
-    await populateCreateManagerSelect();
   } catch (err) {
     messageEl.textContent = 'Departmanlar yuklenirken bir hata olustu';
     messageEl.className = 'form-message error';
@@ -103,13 +93,12 @@ createForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const name = newDepartmentName.value.trim();
   if (!name) return;
-  const manager_id = newDepartmentManager.value || null;
 
   try {
     const res = await fetch('/api/admin/departments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, manager_id }),
+      body: JSON.stringify({ name, manager_id: null }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -117,7 +106,6 @@ createForm.addEventListener('submit', async (event) => {
       return;
     }
     newDepartmentName.value = '';
-    newDepartmentManager.value = '';
     loadDepartments();
   } catch (err) {
     showErrorDialog('Sunucuya baglanilamadi');

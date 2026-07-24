@@ -36,7 +36,7 @@ Sistemdeki üç rolü tutar: Admin, Yonetici, Personel.
 |---|---|---|
 | `id` | `INT UNSIGNED PK` | |
 | `name` | `VARCHAR(100) UNIQUE` | Departman adı |
-| `manager_id` | `INT UNSIGNED UNIQUE, FK → users.id` | Departmanın yöneticisi (opsiyonel) |
+| `manager_id` | `INT UNSIGNED UNIQUE, FK → users.id` | Departmanın yöneticisi (opsiyonel). **Kural:** bu kullanıcının kendi `department_id`'si de bu departmana eşit olmalıdır — bir departmanın yöneticisi başka bir departmandan olamaz |
 | `is_active` | `TINYINT(1)` | "Silinen" departmanlar gercekten silinmez, sadece 0 yapilir; gecmis kullanici/izin kayitlari bozulmaz |
 | `created_at`, `updated_at` | `TIMESTAMP` | |
 

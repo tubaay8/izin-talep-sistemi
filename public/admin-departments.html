@@ -80,17 +80,12 @@
         <label for="new-department-name">Yeni Departman</label>
         <input type="text" id="new-department-name" placeholder="Departman adi" required />
       </div>
-      <div class="filter-field">
-        <label for="new-department-manager">Yonetici (opsiyonel)</label>
-        <select id="new-department-manager">
-          <option value="">Seciniz...</option>
-        </select>
-      </div>
       <button type="submit" class="btn-link">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
         Ekle
       </button>
     </form>
+    <p class="report-file-name">Yönetici ataması, departman oluşturulduktan sonra "Düzenle" ile yapılır (yönetici, atandığı departmanın kendi üyesi olmalıdır).</p>
 
     <p id="list-message" class="form-message"></p>
 
@@ -110,7 +105,7 @@
   <script src="/js/themeToggle.js"></script>
   <script src="/vendor/sweetalert2.all.min.js"></script>
   <script src="/js/confirmDialog.js"></script>
-  <script src="/js/admin-departments.js?v=3"></script>
+  <script src="/js/admin-departments.js?v=4"></script>
   <script src="/js/adminSidebar.js"></script>
   <script src="/js/sidebarProfileLink.js"></script>
   <script src="/js/sw-register.js"></script>

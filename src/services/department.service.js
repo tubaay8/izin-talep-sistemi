@@ -15,12 +15,17 @@ async function getDepartmentById(id) {
   return department;
 }
 
-async function assertValidDepartmentManager(managerId, excludeDepartmentId = null) {
+// Bir departmanin yoneticisi olabilmesi icin aday, o departmanin kendi
+// uyesi (department_id eslesen) olmalidir. Yeni bir departman olustururken
+// henuz o departmana ait kimse olamayacagi icin (departmanId=null) bu
+// asamada gecerli bir yonetici secilemez; yonetici atamasi sadece mevcut
+// bir departman duzenlenirken yapilabilir.
+async function assertValidDepartmentManager(managerId, departmentId = null) {
   if (!managerId) return null;
-  const availableManagers = await userRepository.findAvailableManagers(excludeDepartmentId);
+  const availableManagers = await userRepository.findAvailableManagers(departmentId, departmentId);
   const isValid = availableManagers.some((manager) => manager.id === Number(managerId));
   if (!isValid) {
-    const error = new Error('Gecersiz yonetici veya bu yonetici baska bir departmana atanmis');
+    const error = new Error('Yonetici, atanacagi departmanin kendi uyesi olmali ve baska bir departmani yonetmiyor olmalidir');
     error.status = 400;
     throw error;
   }

@@ -53,18 +53,22 @@ async function findManagers() {
   return rows;
 }
 
-async function findAvailableManagers(excludeDepartmentId = null) {
+// Bir departmanin yoneticisi olabilecek adaylar: o departmanin kendi
+// uyesi olan (department_id eslesen), aktif bir Yonetici ve halihazirda
+// baska bir departmani yonetmiyor olmali (duzenlenen departmanin mevcut
+// yoneticisi haric, boylece secili kalabilir).
+async function findAvailableManagers(departmentId, excludeDepartmentId = null) {
   const [rows] = await pool.query(
     `SELECT u.id, u.full_name
      FROM users u
      JOIN roles r ON r.id = u.role_id
-     WHERE r.name = 'Yonetici' AND u.is_active = 1
+     WHERE r.name = 'Yonetici' AND u.is_active = 1 AND u.department_id = ?
        AND (
          u.id NOT IN (SELECT manager_id FROM departments WHERE manager_id IS NOT NULL)
          OR u.id = (SELECT manager_id FROM departments WHERE id = ?)
        )
      ORDER BY u.full_name`,
-    [excludeDepartmentId]
+    [departmentId, excludeDepartmentId]
   );
   return rows;
 }
