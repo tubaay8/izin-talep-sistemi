@@ -2,8 +2,8 @@ const pool = require('../config/db');
 const { buildLeaveRequestFilters } = require('../utils/leaveRequestFilters');
 
 const SELECT_FIELDS = `
-  lr.id, lr.user_id, lr.leave_type_id, lt.name AS leave_type_name,
-  lr.start_date, lr.end_date, lr.reason, lr.report_file, lr.status,
+  lr.id, lr.user_id, lr.leave_type_id, lt.name AS leave_type_name, lt.is_hourly,
+  lr.start_date, lr.end_date, lr.start_time, lr.end_time, lr.reason, lr.report_file, lr.status,
   lr.delegate_user_id, lr.approved_by, lr.approval_note, lr.decided_at,
   lr.created_at, lr.updated_at
 `;
@@ -35,29 +35,39 @@ async function findById(id) {
   return rows[0] || null;
 }
 
-async function create({ user_id, leave_type_id, start_date, end_date, reason, report_file, delegate_user_id }) {
+async function create({ user_id, leave_type_id, start_date, end_date, start_time, end_time, reason, report_file, delegate_user_id }) {
   const [result] = await pool.query(
-    `INSERT INTO leave_requests (user_id, leave_type_id, start_date, end_date, reason, report_file, delegate_user_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [user_id, leave_type_id, start_date, end_date, reason || null, report_file || null, delegate_user_id || null]
+    `INSERT INTO leave_requests (user_id, leave_type_id, start_date, end_date, start_time, end_time, reason, report_file, delegate_user_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      user_id,
+      leave_type_id,
+      start_date,
+      end_date,
+      start_time || null,
+      end_time || null,
+      reason || null,
+      report_file || null,
+      delegate_user_id || null,
+    ]
   );
   return result.insertId;
 }
 
-async function update(id, { leave_type_id, start_date, end_date, reason, report_file, delegate_user_id }) {
+async function update(id, { leave_type_id, start_date, end_date, start_time, end_time, reason, report_file, delegate_user_id }) {
   if (report_file !== undefined) {
     await pool.query(
       `UPDATE leave_requests
-       SET leave_type_id = ?, start_date = ?, end_date = ?, reason = ?, report_file = ?, delegate_user_id = ?
+       SET leave_type_id = ?, start_date = ?, end_date = ?, start_time = ?, end_time = ?, reason = ?, report_file = ?, delegate_user_id = ?
        WHERE id = ?`,
-      [leave_type_id, start_date, end_date, reason || null, report_file, delegate_user_id || null, id]
+      [leave_type_id, start_date, end_date, start_time || null, end_time || null, reason || null, report_file, delegate_user_id || null, id]
     );
   } else {
     await pool.query(
       `UPDATE leave_requests
-       SET leave_type_id = ?, start_date = ?, end_date = ?, reason = ?, delegate_user_id = ?
+       SET leave_type_id = ?, start_date = ?, end_date = ?, start_time = ?, end_time = ?, reason = ?, delegate_user_id = ?
        WHERE id = ?`,
-      [leave_type_id, start_date, end_date, reason || null, delegate_user_id || null, id]
+      [leave_type_id, start_date, end_date, start_time || null, end_time || null, reason || null, delegate_user_id || null, id]
     );
   }
 }
@@ -269,7 +279,7 @@ async function findDepartmentConflicts(departmentId, userId, startDate, endDate)
 
 async function findApprovedQuotaRequestsForUserYear(userId, year) {
   const [rows] = await pool.query(
-    `SELECT lr.start_date, lr.end_date
+    `SELECT lr.start_date, lr.end_date, lr.start_time, lr.end_time, lt.is_hourly
      FROM leave_requests lr
      JOIN leave_types lt ON lt.id = lr.leave_type_id
      WHERE lr.user_id = ? AND lr.status = 'approved' AND lt.counts_toward_quota = 1

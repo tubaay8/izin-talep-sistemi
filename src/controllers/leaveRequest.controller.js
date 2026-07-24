@@ -7,13 +7,15 @@ const REPORTS_DIR = path.join(__dirname, '..', '..', 'storage', 'reports');
 
 async function create(req, res) {
   try {
-    const { leave_type_id, start_date, end_date, reason, delegate_user_id } = req.body;
+    const { leave_type_id, start_date, end_date, start_time, end_time, reason, delegate_user_id } = req.body;
     const report_file = req.file ? req.file.filename : undefined;
     const request = await leaveRequestService.createLeaveRequest({
       user_id: req.session.user.id,
       leave_type_id,
       start_date,
       end_date,
+      start_time: start_time || null,
+      end_time: end_time || null,
       reason,
       report_file,
       delegate_user_id: delegate_user_id || null,
@@ -69,12 +71,14 @@ async function getOne(req, res) {
 
 async function update(req, res) {
   try {
-    const { leave_type_id, start_date, end_date, reason, delegate_user_id } = req.body;
+    const { leave_type_id, start_date, end_date, start_time, end_time, reason, delegate_user_id } = req.body;
     const report_file = req.file ? req.file.filename : undefined;
     const request = await leaveRequestService.updateLeaveRequest(req.params.id, req.session.user.id, {
       leave_type_id,
       start_date,
       end_date,
+      start_time: start_time || null,
+      end_time: end_time || null,
       reason,
       report_file,
       delegate_user_id: delegate_user_id || null,

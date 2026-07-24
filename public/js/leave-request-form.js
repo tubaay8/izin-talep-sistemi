@@ -7,6 +7,55 @@ const reportUploadGroup = document.getElementById('report-upload-group');
 const reportFileInput = document.getElementById('report_file');
 const reportFileNameEl = document.getElementById('report-file-name');
 const reportExistingFileEl = document.getElementById('report-existing-file');
+const timeRangeGroup = document.getElementById('time-range-group');
+const timeRangeTotalEl = document.getElementById('time-range-total');
+const startTimeInput = document.getElementById('start_time');
+const endTimeInput = document.getElementById('end_time');
+
+let leaveTypes = [];
+
+function getSelectedLeaveType() {
+  return leaveTypes.find((type) => String(type.id) === leaveTypeSelect.value);
+}
+
+function isHourlyLeaveSelected() {
+  const type = getSelectedLeaveType();
+  return Boolean(type && type.is_hourly);
+}
+
+function updateTimeRangeTotal() {
+  if (!startTimeInput.value || !endTimeInput.value) {
+    timeRangeTotalEl.textContent = '';
+    timeRangeTotalEl.classList.remove('error');
+    return;
+  }
+  const [sh, sm] = startTimeInput.value.split(':').map(Number);
+  const [eh, em] = endTimeInput.value.split(':').map(Number);
+  const minutes = eh * 60 + em - (sh * 60 + sm);
+  if (minutes <= 0) {
+    timeRangeTotalEl.textContent = 'Bitis saati baslangic saatinden sonra olmalidir';
+    timeRangeTotalEl.classList.add('error');
+    return;
+  }
+  const hours = Math.round((minutes / 60) * 10) / 10;
+  timeRangeTotalEl.textContent = `Toplam: ${hours} saat`;
+  timeRangeTotalEl.classList.remove('error');
+}
+
+function updateTimeRangeVisibility() {
+  const isHourly = isHourlyLeaveSelected();
+  timeRangeGroup.hidden = !isHourly;
+  startTimeInput.required = isHourly;
+  endTimeInput.required = isHourly;
+  endDateInput.readOnly = isHourly;
+  if (isHourly && startDateInput.value) {
+    endDateInput.value = startDateInput.value;
+  }
+  updateTimeRangeTotal();
+}
+
+startTimeInput.addEventListener('change', updateTimeRangeTotal);
+endTimeInput.addEventListener('change', updateTimeRangeTotal);
 
 const requestId = new URLSearchParams(window.location.search).get('id');
 const isEditMode = window.location.pathname === '/leave-requests/edit' && requestId;
@@ -30,6 +79,7 @@ function updateReportFieldVisibility() {
 }
 
 leaveTypeSelect.addEventListener('change', updateReportFieldVisibility);
+leaveTypeSelect.addEventListener('change', updateTimeRangeVisibility);
 
 reportFileInput.addEventListener('change', () => {
   reportFileNameEl.textContent = reportFileInput.files[0] ? reportFileInput.files[0].name : '';
@@ -43,7 +93,8 @@ reportFileInput.addEventListener('change', () => {
 async function loadLeaveTypes() {
   const res = await fetch('/api/leave-types');
   const data = await res.json();
-  data.leaveTypes.forEach((type) => {
+  leaveTypes = data.leaveTypes;
+  leaveTypes.forEach((type) => {
     const option = document.createElement('option');
     option.value = type.id;
     option.textContent = type.name;
@@ -73,6 +124,8 @@ async function loadExistingRequest() {
   document.getElementById('start_date').value = data.request.start_date.slice(0, 10);
   document.getElementById('end_date').value = data.request.end_date.slice(0, 10);
   document.getElementById('reason').value = data.request.reason || '';
+  if (data.request.start_time) startTimeInput.value = data.request.start_time.slice(0, 5);
+  if (data.request.end_time) endTimeInput.value = data.request.end_time.slice(0, 5);
   if (data.request.delegate_user_id) {
     document.getElementById('delegate_user_id').value = data.request.delegate_user_id;
   }
@@ -84,6 +137,7 @@ async function loadExistingRequest() {
   }
 
   updateReportFieldVisibility();
+  updateTimeRangeVisibility();
   checkDepartmentConflicts();
 }
 
@@ -96,6 +150,10 @@ form.addEventListener('submit', async (event) => {
   formData.append('leave_type_id', leaveTypeSelect.value);
   formData.append('start_date', document.getElementById('start_date').value);
   formData.append('end_date', document.getElementById('end_date').value);
+  if (isHourlyLeaveSelected()) {
+    formData.append('start_time', startTimeInput.value);
+    formData.append('end_time', endTimeInput.value);
+  }
   formData.append('reason', document.getElementById('reason').value);
   formData.append('delegate_user_id', document.getElementById('delegate_user_id').value);
   if (reportFileInput.files[0]) {
@@ -128,6 +186,7 @@ Promise.all([loadLeaveTypes(), loadDelegateCandidates()]).then(() => {
     loadExistingRequest();
   } else {
     updateReportFieldVisibility();
+    updateTimeRangeVisibility();
   }
 });
 
@@ -235,7 +294,10 @@ async function checkDepartmentConflicts() {
 
 showConflictState('clean');
 
-startDateInput.addEventListener('change', checkDepartmentConflicts);
+startDateInput.addEventListener('change', () => {
+  if (isHourlyLeaveSelected()) endDateInput.value = startDateInput.value;
+  checkDepartmentConflicts();
+});
 endDateInput.addEventListener('change', checkDepartmentConflicts);
 
 /* ---------- Vekalet bilgisi ---------- */

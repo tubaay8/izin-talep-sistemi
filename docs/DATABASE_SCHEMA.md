@@ -61,6 +61,7 @@ Sistemdeki üç rolü tutar: Admin, Yonetici, Personel.
 | `name` | `VARCHAR(50) UNIQUE` | Örn. Yıllık İzin, Mazeret İzni, Hastalık İzni |
 | `description` | `VARCHAR(255) NULL` | |
 | `counts_toward_quota` | `TINYINT(1)` | Bu tür, personelin yıllık izin kotasından düşülsün mü |
+| `is_hourly` | `TINYINT(1)` | Bu tür gün yerine saat araligiyla mi alinir (örn. Saatlik İzin) |
 | `created_at`, `updated_at` | `TIMESTAMP` | |
 
 ### `leave_requests`
@@ -71,7 +72,8 @@ Sistemin merkezindeki tablo.
 | `id` | `INT UNSIGNED PK` | |
 | `user_id` | `INT UNSIGNED, FK → users.id` | Talebi oluşturan personel |
 | `leave_type_id` | `INT UNSIGNED, FK → leave_types.id` | |
-| `start_date`, `end_date` | `DATE` | |
+| `start_date`, `end_date` | `DATE` | Saatlik izin turunde ikisi de ayni gundur |
+| `start_time`, `end_time` | `TIME NULL` | Sadece saatlik izin turunde (`leave_types.is_hourly=1`) doludur |
 | `reason` | `VARCHAR(500) NULL` | Personelin açıklaması |
 | `delegate_user_id` | `INT UNSIGNED NULL, FK → users.id` | İzin süresince vekalet bırakılan kişi |
 | `report_file` | `VARCHAR(255) NULL` | Hastalık izni için yüklenen rapor dosyası |
@@ -91,6 +93,7 @@ Personelin yıl bazlı izin bakiyesi/kota takibi.
 | `year` | `SMALLINT UNSIGNED` | |
 | `entitled_days` | `SMALLINT UNSIGNED` | Hak edilen gün sayısı (varsayılan 14) |
 | `used_days` | `SMALLINT UNSIGNED` | Kullanılan gün sayısı |
+| `pending_minutes` | `SMALLINT UNSIGNED` | Saatlik izinlerden biriken, henuz tam gune tamamlanmamis dakika (0-539). 540 dakikaya (9 saat) ulasinca `used_days` 1 artar, bu alan sifirlanir |
 | `created_at`, `updated_at` | `TIMESTAMP` | |
 
 ### `activity_logs`
@@ -122,4 +125,4 @@ Onay/red/güncelleme gibi işlemlerin denetim (audit) kaydı.
 
 - Tüm tablolar `InnoDB` motoru ve `utf8mb4 / utf8mb4_turkish_ci` karakter seti ile oluşturulur (Türkçe karakter ve sıralama desteği için).
 - Yabancı anahtarların çoğu `ON DELETE SET NULL` veya `ON DELETE CASCADE` ile tanımlıdır (detaylar için ilgili migration dosyasına bakılabilir); bu sayede bir kullanıcı silinse dahi geçmiş kayıtlar (activity_logs gibi) kaybolmaz.
-- Migration dosyaları idempotent yazılmıştır (`CREATE TABLE IF NOT EXISTS`, `ADD COLUMN IF NOT EXISTS`), yani `npm run db:migrate` güvenle birden fazla kez çalıştırılabilir.
+- Migration dosyaları idempotent yazılmıştır (`CREATE TABLE IF NOT EXISTS`; kolon eklemeleri için `information_schema` kontrolü + `PREPARE`/`EXECUTE` — `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` bazı MySQL sürümlerinde desteklenmediği için tercih edildi), yani `npm run db:migrate` güvenle birden fazla kez çalıştırılabilir.

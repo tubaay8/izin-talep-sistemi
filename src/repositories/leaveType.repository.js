@@ -1,13 +1,13 @@
 const pool = require('../config/db');
 
 async function findAll() {
-  const [rows] = await pool.query('SELECT id, name, description, counts_toward_quota FROM leave_types ORDER BY name');
+  const [rows] = await pool.query('SELECT id, name, description, counts_toward_quota, is_hourly FROM leave_types ORDER BY name');
   return rows;
 }
 
 async function findById(id) {
   const [rows] = await pool.query(
-    'SELECT id, name, description, counts_toward_quota FROM leave_types WHERE id = ? LIMIT 1',
+    'SELECT id, name, description, counts_toward_quota, is_hourly FROM leave_types WHERE id = ? LIMIT 1',
     [id]
   );
   return rows[0] || null;

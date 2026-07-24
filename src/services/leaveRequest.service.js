@@ -1,7 +1,7 @@
 const leaveRequestRepository = require('../repositories/leaveRequest.repository');
 const userRepository = require('../repositories/user.repository');
 const leaveTypeRepository = require('../repositories/leaveType.repository');
-const { assertValidDateRange, assertLeaveTypeExists, assertReportProvided, assertValidDelegate } = require('../utils/leaveRequestValidators');
+const { assertValidDateRange, assertLeaveTypeExists, assertReportProvided, assertValidDelegate, assertValidTimeRange } = require('../utils/leaveRequestValidators');
 const activityLogService = require('./activityLog.service');
 const leaveBalanceService = require('./leaveBalance.service');
 const mailService = require('./mail.service');
@@ -22,11 +22,12 @@ async function getOwnedPendingRequest(id, userId) {
   return request;
 }
 
-async function createLeaveRequest({ user_id, leave_type_id, start_date, end_date, reason, report_file, delegate_user_id }) {
+async function createLeaveRequest({ user_id, leave_type_id, start_date, end_date, start_time, end_time, reason, report_file, delegate_user_id }) {
   assertValidDateRange(start_date, end_date);
   const leaveType = await assertLeaveTypeExists(leave_type_id);
   assertReportProvided(leaveType, report_file);
-  await leaveBalanceService.assertSufficientBalance(user_id, leaveType, start_date, end_date);
+  assertValidTimeRange(leaveType, start_date, end_date, start_time, end_time);
+  await leaveBalanceService.assertSufficientBalance(user_id, leaveType, { startDate: start_date, endDate: end_date, startTime: start_time, endTime: end_time });
 
   const requestingUser = await userRepository.findById(user_id);
   await assertValidDelegate(delegate_user_id, requestingUser);
@@ -36,6 +37,8 @@ async function createLeaveRequest({ user_id, leave_type_id, start_date, end_date
     leave_type_id,
     start_date,
     end_date,
+    start_time,
+    end_time,
     reason,
     report_file,
     delegate_user_id,
@@ -105,9 +108,10 @@ async function getMyLeaveRequestById(id, userId) {
   return request;
 }
 
-async function updateLeaveRequest(id, userId, { leave_type_id, start_date, end_date, reason, report_file, delegate_user_id }) {
+async function updateLeaveRequest(id, userId, { leave_type_id, start_date, end_date, start_time, end_time, reason, report_file, delegate_user_id }) {
   assertValidDateRange(start_date, end_date);
   const leaveType = await assertLeaveTypeExists(leave_type_id);
+  assertValidTimeRange(leaveType, start_date, end_date, start_time, end_time);
   const existing = await getOwnedPendingRequest(id, userId);
 
   const effectiveReportFile = report_file !== undefined ? report_file : existing.report_file;
@@ -116,7 +120,7 @@ async function updateLeaveRequest(id, userId, { leave_type_id, start_date, end_d
   const requestingUser = await userRepository.findById(userId);
   await assertValidDelegate(delegate_user_id, requestingUser);
 
-  await leaveRequestRepository.update(id, { leave_type_id, start_date, end_date, reason, report_file, delegate_user_id });
+  await leaveRequestRepository.update(id, { leave_type_id, start_date, end_date, start_time, end_time, reason, report_file, delegate_user_id });
   const request = await leaveRequestRepository.findById(id);
 
   await activityLogService.log({
@@ -203,6 +207,8 @@ async function decideLeaveRequest(id, managerId, { decision, approval_note }) {
     leaveType,
     startDate: request.start_date,
     endDate: request.end_date,
+    startTime: request.start_time,
+    endTime: request.end_time,
     oldStatus: request.status,
     newStatus: decision,
   });

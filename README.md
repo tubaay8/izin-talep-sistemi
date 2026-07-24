@@ -22,7 +22,8 @@
 ## Özellikler
 
 **Personel**
-- İzin talebi oluşturma, düzenleme, iptal etme
+- İzin talebi oluşturma, düzenleme, iptal etme (gün bazlı veya saat aralığıyla "Saatlik İzin")
+- Saatlik izinler otomatik birikir; toplam 9 saate (bir iş günü) ulaşınca yıllık izin bakiyesinden 1 gün düşer
 - Talep sırasında vekil personel atama (departman içi çakışma/uygunluk kontrolü ile)
 - Kendi izin taleplerini ve geçmişini listeleme, filtreleme, PDF/CSV olarak dışa aktarma
 - İzin bakiyesi/kota takibi

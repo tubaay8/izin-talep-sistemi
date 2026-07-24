@@ -1,7 +1,7 @@
 const leaveRequestRepository = require('../repositories/leaveRequest.repository');
 const leaveTypeRepository = require('../repositories/leaveType.repository');
 const userRepository = require('../repositories/user.repository');
-const { assertValidDateRange, assertLeaveTypeExists, assertReportProvided } = require('../utils/leaveRequestValidators');
+const { assertValidDateRange, assertLeaveTypeExists, assertReportProvided, assertValidTimeRange } = require('../utils/leaveRequestValidators');
 const activityLogService = require('./activityLog.service');
 const leaveBalanceService = require('./leaveBalance.service');
 const mailService = require('./mail.service');
@@ -53,10 +53,11 @@ async function getLeaveRequestById(id) {
   return request;
 }
 
-async function updateLeaveRequest(id, { leave_type_id, start_date, end_date, reason, report_file }) {
+async function updateLeaveRequest(id, { leave_type_id, start_date, end_date, start_time, end_time, reason, report_file }) {
   const existing = await getLeaveRequestById(id);
   assertValidDateRange(start_date, end_date);
   const leaveType = await assertLeaveTypeExists(leave_type_id);
+  assertValidTimeRange(leaveType, start_date, end_date, start_time, end_time);
 
   const effectiveReportFile = report_file !== undefined ? report_file : existing.report_file;
   assertReportProvided(leaveType, effectiveReportFile);
@@ -70,6 +71,8 @@ async function updateLeaveRequest(id, { leave_type_id, start_date, end_date, rea
       leaveType: oldLeaveType,
       startDate: existing.start_date,
       endDate: existing.end_date,
+      startTime: existing.start_time,
+      endTime: existing.end_time,
       oldStatus: 'approved',
       newStatus: 'rejected',
     });
@@ -78,12 +81,14 @@ async function updateLeaveRequest(id, { leave_type_id, start_date, end_date, rea
       leaveType,
       startDate: start_date,
       endDate: end_date,
+      startTime: start_time,
+      endTime: end_time,
       oldStatus: 'rejected',
       newStatus: 'approved',
     });
   }
 
-  await leaveRequestRepository.update(id, { leave_type_id, start_date, end_date, reason, report_file });
+  await leaveRequestRepository.update(id, { leave_type_id, start_date, end_date, start_time, end_time, reason, report_file });
   return leaveRequestRepository.findById(id);
 }
 
@@ -112,6 +117,8 @@ async function updateStatus(id, adminId, { status, approval_note }) {
     leaveType,
     startDate: request.start_date,
     endDate: request.end_date,
+    startTime: request.start_time,
+    endTime: request.end_time,
     oldStatus: request.status,
     newStatus: status,
   });

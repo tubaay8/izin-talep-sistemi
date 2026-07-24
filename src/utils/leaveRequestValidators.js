@@ -1,9 +1,32 @@
 const leaveTypeRepository = require('../repositories/leaveType.repository');
 const userRepository = require('../repositories/user.repository');
+const { timeStringToMinutes } = require('./leaveDayCount');
 
 function assertValidDateRange(start_date, end_date) {
   if (new Date(end_date) < new Date(start_date)) {
     const error = new Error('Bitis tarihi baslangic tarihinden once olamaz');
+    error.status = 400;
+    throw error;
+  }
+}
+
+// Saatlik izin turunde talep tek bir gune ait olmali ve gecerli, sirali
+// bir saat araligi (baslangic < bitis) icermelidir.
+function assertValidTimeRange(leaveType, start_date, end_date, start_time, end_time) {
+  if (!leaveType.is_hourly) return;
+
+  if (start_date !== end_date) {
+    const error = new Error('Saatlik izin talebi ayni gun icinde olmalidir');
+    error.status = 400;
+    throw error;
+  }
+  if (!start_time || !end_time) {
+    const error = new Error('Saatlik izin icin baslangic ve bitis saati zorunludur');
+    error.status = 400;
+    throw error;
+  }
+  if (timeStringToMinutes(end_time) <= timeStringToMinutes(start_time)) {
+    const error = new Error('Bitis saati baslangic saatinden sonra olmalidir');
     error.status = 400;
     throw error;
   }
@@ -62,4 +85,5 @@ module.exports = {
   isReportRequired,
   assertReportProvided,
   assertValidDelegate,
+  assertValidTimeRange,
 };

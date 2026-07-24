@@ -37,12 +37,14 @@ async function getOne(req, res) {
 
 async function update(req, res) {
   try {
-    const { leave_type_id, start_date, end_date, reason } = req.body;
+    const { leave_type_id, start_date, end_date, start_time, end_time, reason } = req.body;
     const report_file = req.file ? req.file.filename : undefined;
     const request = await adminLeaveRequestService.updateLeaveRequest(req.params.id, {
       leave_type_id,
       start_date,
       end_date,
+      start_time: start_time || null,
+      end_time: end_time || null,
       reason,
       report_file,
     });

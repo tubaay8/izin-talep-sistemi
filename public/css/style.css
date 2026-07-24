@@ -200,6 +200,32 @@ a {
   font-weight: 600;
 }
 
+.time-range-group {
+  margin-bottom: 1rem;
+}
+
+.time-range-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.time-range-total {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+}
+
+.time-range-total.error {
+  color: var(--badge-red);
+}
+
+.hour-range {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+
 .role-badge {
   display: inline-block;
   padding: 0.25rem 0.7rem;

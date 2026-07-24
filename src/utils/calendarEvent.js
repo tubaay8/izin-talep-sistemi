@@ -7,9 +7,12 @@ function addOneDay(dateStr) {
 }
 
 function toCalendarEvent(request) {
+  const hourSuffix = request.is_hourly
+    ? ` (${String(request.start_time).slice(0, 5)}-${String(request.end_time).slice(0, 5)})`
+    : '';
   return {
     id: request.id,
-    title: `${request.employee_name} - ${request.leave_type_name}`,
+    title: `${request.employee_name} - ${request.leave_type_name}${hourSuffix}`,
     start: request.start_date,
     end: addOneDay(request.end_date),
     allDay: true,
@@ -21,6 +24,8 @@ function toCalendarEvent(request) {
       reason: request.reason || '',
       startDate: request.start_date,
       endDate: request.end_date,
+      startTime: request.start_time || null,
+      endTime: request.end_time || null,
     },
   };
 }

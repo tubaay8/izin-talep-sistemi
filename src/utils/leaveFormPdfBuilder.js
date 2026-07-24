@@ -92,7 +92,6 @@ function buildLeaveFormPdf(request) {
     .text('İZİN FORMU', margin, cursorY, { width: contentWidth, align: 'center' });
   cursorY += 35;
 
-  const dayCount = calculateDayCount(request.start_date, request.end_date);
   const rows = [
     ['Adı Soyadı', request.employee_name],
     ['T.C. Kimlik No', ''],
@@ -100,14 +99,28 @@ function buildLeaveFormPdf(request) {
     ['Departman', request.department_name],
     ['Yönetici', request.manager_name || '-'],
     ['İzin Türü', request.leave_type_name],
-    ['İzin Gün Sayısı', String(dayCount)],
-    ['İzin Başlangıç Tarihi', formatDateTR(request.start_date)],
-    ['İzin Bitiş Tarihi', formatDateTR(request.end_date)],
-    ['Göreve Başlayacağı Tarih', addDaysToDateStr(request.end_date, 1)],
+  ];
+
+  if (request.is_hourly) {
+    rows.push(
+      ['İzin Tarihi', formatDateTR(request.start_date)],
+      ['Saat Aralığı', `${String(request.start_time).slice(0, 5)} - ${String(request.end_time).slice(0, 5)}`]
+    );
+  } else {
+    const dayCount = calculateDayCount(request.start_date, request.end_date);
+    rows.push(
+      ['İzin Gün Sayısı', String(dayCount)],
+      ['İzin Başlangıç Tarihi', formatDateTR(request.start_date)],
+      ['İzin Bitiş Tarihi', formatDateTR(request.end_date)],
+      ['Göreve Başlayacağı Tarih', addDaysToDateStr(request.end_date, 1)]
+    );
+  }
+
+  rows.push(
     ['Açıklama / Talep Nedeni', request.reason || '-'],
     ['Talep Durumu', STATUS_LABELS[request.status] || request.status],
-    ['Onaylayan Yönetici', request.approved_by_name || '-'],
-  ];
+    ['Onaylayan Yönetici', request.approved_by_name || '-']
+  );
 
   const labelWidth = 190;
   const valueWidth = contentWidth - labelWidth;

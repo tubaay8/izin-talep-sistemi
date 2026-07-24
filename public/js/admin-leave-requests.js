@@ -91,6 +91,12 @@ function countDays(startDate, endDate) {
 
 function renderRow(request) {
   const tr = document.createElement('tr');
+  const startCell = request.start_time
+    ? `${formatDate(request.start_date)} <span class="hour-range">${request.start_time.slice(0, 5)}</span>`
+    : formatDate(request.start_date);
+  const endCell = request.end_time
+    ? `${formatDate(request.end_date)} <span class="hour-range">${request.end_time.slice(0, 5)}</span>`
+    : formatDate(request.end_date);
   tr.innerHTML = `
     <td class="col-checkbox">
       <input type="checkbox" class="row-checkbox" data-id="${request.id}" ${selectedIds.has(request.id) ? 'checked' : ''} />
@@ -99,8 +105,8 @@ function renderRow(request) {
     <td>${request.department_name}</td>
     <td>${request.manager_name || '-'}</td>
     <td>${request.leave_type_name}</td>
-    <td>${formatDate(request.start_date)}</td>
-    <td>${formatDate(request.end_date)}</td>
+    <td>${startCell}</td>
+    <td>${endCell}</td>
     <td><span class="status-badge status-${request.status}">${STATUS_LABELS[request.status]}</span></td>
     <td>${request.report_file ? `<a href="/api/leave-requests/${request.id}/report" target="_blank" class="report-badge">Raporu Görüntüle</a>` : '-'}</td>
     <td>
