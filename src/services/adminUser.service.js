@@ -20,7 +20,7 @@ async function assertRoleExists(role_id) {
 
 async function assertDepartmentExists(department_id) {
   const department = await departmentRepository.findById(department_id);
-  if (!department) {
+  if (!department || !department.is_active) {
     const error = new Error('Gecersiz departman');
     error.status = 400;
     throw error;

@@ -34,7 +34,7 @@ function assertValidTimeRange(leaveType, start_date, end_date, start_time, end_t
 
 async function assertLeaveTypeExists(leave_type_id) {
   const leaveType = await leaveTypeRepository.findById(leave_type_id);
-  if (!leaveType) {
+  if (!leaveType || !leaveType.is_active) {
     const error = new Error('Gecersiz izin turu');
     error.status = 400;
     throw error;

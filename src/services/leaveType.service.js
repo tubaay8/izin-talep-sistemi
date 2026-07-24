@@ -46,18 +46,11 @@ async function updateLeaveType(id, { name, description }) {
   return leaveTypeRepository.findById(id);
 }
 
+// Izin turu veritabanindan silinmez, sadece pasife alinir: bu turu kullanan
+// gecmis izin talepleri bozulmadan dogru gorunmeye devam eder.
 async function deleteLeaveType(id) {
   await getLeaveTypeById(id);
-  try {
-    await leaveTypeRepository.remove(id);
-  } catch (err) {
-    if (err.code === 'ER_ROW_IS_REFERENCED_2' || err.code === 'ER_ROW_IS_REFERENCED') {
-      const error = new Error('Bu izin turune bagli izin talepleri oldugu icin silinemez');
-      error.status = 409;
-      throw error;
-    }
-    throw err;
-  }
+  await leaveTypeRepository.deactivate(id);
 }
 
 module.exports = { getAllLeaveTypes, getLeaveTypeById, createLeaveType, updateLeaveType, deleteLeaveType };

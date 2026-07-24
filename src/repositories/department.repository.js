@@ -1,7 +1,7 @@
 const pool = require('../config/db');
 
 const SELECT_FIELDS = `
-  d.id, d.name, d.manager_id, m.full_name AS manager_name
+  d.id, d.name, d.manager_id, d.is_active, m.full_name AS manager_name
 `;
 
 async function findAll() {
@@ -9,6 +9,7 @@ async function findAll() {
     `SELECT ${SELECT_FIELDS}
      FROM departments d
      LEFT JOIN users m ON m.id = d.manager_id
+     WHERE d.is_active = 1
      ORDER BY d.name`
   );
   return rows;
@@ -32,7 +33,7 @@ async function findByName(name) {
 }
 
 async function countTotal() {
-  const [rows] = await pool.query('SELECT COUNT(*) AS total FROM departments');
+  const [rows] = await pool.query('SELECT COUNT(*) AS total FROM departments WHERE is_active = 1');
   return rows[0].total;
 }
 
@@ -45,8 +46,10 @@ async function update(id, name, managerId = null) {
   await pool.query('UPDATE departments SET name = ?, manager_id = ? WHERE id = ?', [name, managerId, id]);
 }
 
-async function remove(id) {
-  await pool.query('DELETE FROM departments WHERE id = ?', [id]);
+// Departmanlar veritabanindan silinmez, sadece pasife alinir; gecmis
+// kullanici/izin kayitlari bu sayede bozulmadan dogru gorunmeye devam eder.
+async function deactivate(id) {
+  await pool.query('UPDATE departments SET is_active = 0 WHERE id = ?', [id]);
 }
 
-module.exports = { findAll, findById, findByName, countTotal, create, update, remove };
+module.exports = { findAll, findById, findByName, countTotal, create, update, deactivate };

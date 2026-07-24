@@ -37,6 +37,7 @@ Sistemdeki üç rolü tutar: Admin, Yonetici, Personel.
 | `id` | `INT UNSIGNED PK` | |
 | `name` | `VARCHAR(100) UNIQUE` | Departman adı |
 | `manager_id` | `INT UNSIGNED UNIQUE, FK → users.id` | Departmanın yöneticisi (opsiyonel) |
+| `is_active` | `TINYINT(1)` | "Silinen" departmanlar gercekten silinmez, sadece 0 yapilir; gecmis kullanici/izin kayitlari bozulmaz |
 | `created_at`, `updated_at` | `TIMESTAMP` | |
 
 ### `users`
@@ -62,6 +63,7 @@ Sistemdeki üç rolü tutar: Admin, Yonetici, Personel.
 | `description` | `VARCHAR(255) NULL` | |
 | `counts_toward_quota` | `TINYINT(1)` | Bu tür, personelin yıllık izin kotasından düşülsün mü |
 | `is_hourly` | `TINYINT(1)` | Bu tür gün yerine saat araligiyla mi alinir (örn. Saatlik İzin) |
+| `is_active` | `TINYINT(1)` | "Silinen" izin turleri gercekten silinmez, sadece 0 yapilir; bu turu kullanan gecmis izin talepleri bozulmaz |
 | `created_at`, `updated_at` | `TIMESTAMP` | |
 
 ### `leave_requests`

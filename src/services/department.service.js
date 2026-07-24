@@ -66,18 +66,11 @@ async function updateDepartment(id, name, managerId) {
   return departmentRepository.findById(id);
 }
 
+// Departman veritabanindan silinmez, sadece pasife alinir: bagli
+// kullanicilarin/izin kayitlarinin gecmisi bozulmadan dogru gorunmeye devam eder.
 async function deleteDepartment(id) {
   await getDepartmentById(id);
-  try {
-    await departmentRepository.remove(id);
-  } catch (err) {
-    if (err.code === 'ER_ROW_IS_REFERENCED_2' || err.code === 'ER_ROW_IS_REFERENCED') {
-      const error = new Error('Bu departmana bagli kullanicilar oldugu icin silinemez');
-      error.status = 409;
-      throw error;
-    }
-    throw err;
-  }
+  await departmentRepository.deactivate(id);
 }
 
 module.exports = { getAllDepartments, getDepartmentById, createDepartment, updateDepartment, deleteDepartment };
